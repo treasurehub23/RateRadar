@@ -20,8 +20,13 @@
 .hero h1 .accent { color: var(--purple-600); }
 .hero p { color: var(--text-muted); font-size: 16px; max-width: 500px; margin-bottom: 30px; line-height: 1.6; }
 
-.hero-visual { position: relative; flex-shrink: 0; width: 340px; height: 340px; }
-
+.hero-visual {
+  position: relative;
+  flex-shrink: 0;
+  width: 340px;
+  height: 340px;
+  overflow: visible;
+}
 .earth-sphere {
   position: absolute;
   top: 20px;
@@ -61,24 +66,33 @@
     radial-gradient(circle at 75% 80%, rgba(15,23,42,0.55) 0%, transparent 55%);
   pointer-events: none;
 }
+.hero-arcs {
+  position: absolute;
+  top: -40px;
+  left: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
+  pointer-events: none;
+  z-index: 2;
+}
 
 .flag-chip {
   position: absolute;
-  top: 10px;
-  right: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--card);
+  background: white;
   padding: 8px 16px 8px 10px;
   border-radius: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  font-size: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+  font-size: 13px;
   font-weight: 700;
-  color: var(--text);
-  z-index: 3;
-  border: 1px solid var(--border);
+  color: var(--gray-900);
+  z-index: 4;
 }
+.flag-chip-from { top: 0; left: -20px; }
+.flag-chip-to { top: 0; right: -20px; }
+
 .flag-img { width: 26px; height: 18px; border-radius: 3px; object-fit: cover; }
 .flag-code { letter-spacing: 0.5px; }
 
@@ -189,3 +203,10 @@
   .dashboard-grid { grid-template-columns: 1fr; }
   .popular-grid { grid-template-columns: 1fr; }
 }
+.side-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.side-card-head h3 { margin-bottom: 0; }

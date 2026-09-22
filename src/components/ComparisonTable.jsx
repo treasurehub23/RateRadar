@@ -1,35 +1,70 @@
 import MerchantBadge from './MerchantBadge'
 import './ComparisonTable.css'
 
+// Inline SVG logos — 100% reliable, no external requests
+function BinanceLogo() {
+  return (
+    <svg viewBox="0 0 126.61 126.61" width="22" height="22" fill="#F0B90B">
+      <path d="M38.73 53.2 63.3 28.63 87.9 53.2l14.24-14.24L63.3 0 24.49 38.95zM0 63.3l14.24-14.24L28.48 63.3 14.24 77.54zm38.73 10.11L63.3 97.97l24.6-24.56 14.26 14.21-.02.02L63.3 126.61 24.49 87.66l-.02-.02zM98.13 63.3l14.24-14.24 14.24 14.24-14.24 14.24z"/>
+      <path d="M77.85 63.28h.02L63.3 48.73 52.68 59.34l-1.22 1.22-2.86 2.85-.02.02.02.02L63.3 77.85l14.57-14.55.02-.02z"/>
+    </svg>
+  )
+}
+
+function WiseLogo() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="#163300">
+      <path d="M11.045 0 6.32 9.02h5.372L8.75 24l13.858-14.61h-5.628L22.78 0z"/>
+    </svg>
+  )
+}
+
+function LemfiLogo() {
+  return (
+    <svg viewBox="0 0 40 40" width="22" height="22">
+      <text x="20" y="28" textAnchor="middle" fill="#fff" fontSize="24" fontWeight="800" fontFamily="Sora, sans-serif">L</text>
+    </svg>
+  )
+}
+
+function SendwaveLogo() {
+  return (
+    <svg viewBox="0 0 40 40" width="22" height="22" fill="#0B1F3A">
+      <path d="M6 22c4 0 6-4 10-4s6 4 10 4 6-4 8-4v3c-2 0-4 4-8 4s-6-4-10-4-6 4-10 4-4-2-4-3z"/>
+      <path d="M6 16c4 0 6-4 10-4s6 4 10 4 6-4 8-4v3c-2 0-4 4-8 4s-6-4-10-4-6 4-10 4-4-2-4-3z" opacity="0.7"/>
+    </svg>
+  )
+}
+
+function GtbankLogo() {
+  return (
+    <svg viewBox="0 0 40 40" width="22" height="22">
+      <text x="20" y="28" textAnchor="middle" fill="#fff" fontSize="24" fontWeight="800" fontFamily="Sora, sans-serif">G</text>
+    </svg>
+  )
+}
+
 const LOGO_MAP = {
-  'Binance P2P': { domain: 'binance.com', bg: '#F0B90B', label: 'B' },
-  'Wise':       { domain: 'wise.com',     bg: '#9FE870', label: 'W' },
-  'Lemfi':      { domain: 'lemfi.com',    bg: '#00C48C', label: 'L' },
-  'Sendwave':   { domain: 'sendwave.com', bg: '#FFD23F', label: 'S' },
-  'GTBank':     { domain: 'gtbank.com',   bg: '#E31E24', label: 'G' },
+  'Binance P2P': { Logo: BinanceLogo, bg: '#0B0E11' },
+  'Wise':        { Logo: WiseLogo,    bg: '#9FE870' },
+  'Lemfi':       { Logo: LemfiLogo,   bg: '#00C48C' },
+  'Sendwave':    { Logo: SendwaveLogo,bg: '#FFD23F' },
+  'GTBank':      { Logo: GtbankLogo,  bg: '#E31E24' },
 }
 
 function ProviderLogo({ provider }) {
-  const meta = LOGO_MAP[provider] || { domain: null, bg: '#7C3AED', label: provider[0] }
-
-  if (!meta.domain) {
+  const meta = LOGO_MAP[provider]
+  if (!meta) {
     return (
-      <div className="provider-logo" style={{ background: meta.bg }}>
-        {meta.label}
+      <div className="provider-logo" style={{ background: '#7C3AED' }}>
+        <span className="provider-logo-fallback">{provider[0]}</span>
       </div>
     )
   }
-
+  const { Logo, bg } = meta
   return (
-    <div className="provider-logo" style={{ background: meta.bg }}>
-      <img
-        src={`https://logo.clearbit.com/${meta.domain}`}
-        alt={provider}
-        onError={(e) => {
-          e.currentTarget.style.display = 'none'
-          e.currentTarget.parentElement.textContent = meta.label
-        }}
-      />
+    <div className="provider-logo" style={{ background: bg }}>
+      <Logo />
     </div>
   )
 }

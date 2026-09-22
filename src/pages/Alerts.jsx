@@ -2,7 +2,19 @@ import { useEffect, useState } from 'react'
 import { getAlerts } from '../api'
 import './Alerts.css'
 
-const severityIcon = { high: '⚠️', medium: '⚠️', info: 'ℹ️', success: '✓' }
+const SEVERITY = {
+  high:    { icon: '⚠',  cls: 'high' },
+  medium:  { icon: '⚠',  cls: 'medium' },
+  info:    { icon: 'ℹ',  cls: 'info' },
+  success: { icon: '✓',  cls: 'success' },
+}
+
+const FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: 'rate-spread', label: 'Rate Spread' },
+  { key: 'fee-change', label: 'Fee Change' },
+  { key: 'reliability', label: 'Reliability' },
+]
 
 export default function Alerts() {
   const [alerts, setAlerts] = useState([])
@@ -15,39 +27,40 @@ export default function Alerts() {
   return (
     <div>
       <div className="page-header">
-        <div>
-          <h1>🔔 Rate Transparency Alerts</h1>
-          <p>We monitor for unusual rate spreads, hidden fees and important changes so you don't lose money.</p>
-        </div>
+        <h1>🔔 Rate Transparency Alerts</h1>
+        <p>We monitor for unusual rate spreads, hidden fees and important changes so you don't lose money.</p>
       </div>
 
       <div className="filter-tabs">
-        {['all', 'rate-spread', 'fee-change', 'reliability'].map((f) => (
+        {FILTERS.map((f) => (
           <button
-            key={f}
-            className={`filter-tab ${filter === f ? 'active' : ''}`}
-            onClick={() => setFilter(f)}
+            key={f.key}
+            className={`filter-tab ${filter === f.key ? 'active' : ''}`}
+            onClick={() => setFilter(f.key)}
           >
-            {f === 'all' ? 'All' : f === 'rate-spread' ? 'Rate Spread' : f === 'fee-change' ? 'Fee Change' : 'Reliability'}
+            {f.label}
           </button>
         ))}
       </div>
 
       <div className="alerts-list">
-        {filtered.map((a) => (
-          <div key={a.id} className={`alert-item ${a.severity}`}>
-            <div className="alert-icon">{severityIcon[a.severity]}</div>
-            <div className="alert-content">
-              <div className="alert-title">{a.title}</div>
-              <div className="alert-body">{a.body}</div>
+        {filtered.map((a) => {
+          const sev = SEVERITY[a.severity] || SEVERITY.info
+          return (
+            <div key={a.id} className="alert-row">
+              <span className={`alert-icon ${sev.cls}`}>{sev.icon}</span>
+              <div className="alert-content">
+                <div className="alert-title">{a.title}</div>
+                <div className="alert-body">{a.body}</div>
+              </div>
+              <div className="alert-time">{a.time}</div>
             </div>
-            <div className="alert-time">{a.time}</div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <div className="alert-threshold">
-        <h3>🔔 Rate Alert Threshold</h3>
+        <h3>⚠ Rate Alert Threshold</h3>
         <p>Get notified when the rate spread is more than:</p>
         <div className="threshold-row">
           <input type="range" min="1" max="20" defaultValue="5" />
