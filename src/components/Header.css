@@ -1,0 +1,116 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 4px 0 20px;
+  position: relative;
+}
+
+.topbar-spacer { flex: 1; }
+
+/* Auth buttons */
+.auth-buttons { display: flex; gap: 10px; }
+
+.btn-signin {
+  background: transparent;
+  color: var(--purple-700);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.btn-signin:hover { background: var(--purple-50); }
+
+.btn-signup {
+  background: var(--purple-600);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.btn-signup:hover { background: var(--purple-700); }
+
+/* Bell */
+.topbar-bell {
+  background: transparent;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--gray-700);
+  position: relative;
+}
+.topbar-bell:hover { background: var(--purple-50); }
+.topbar-bell::after {
+  content: '';
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 8px; height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+/* User pill + dropdown */
+.topbar-user-wrap { position: relative; }
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 6px 14px 6px 6px;
+  border-radius: 30px;
+  box-shadow: var(--shadow-sm);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+.topbar-user:hover { box-shadow: var(--shadow-md); }
+
+.topbar-user svg.rotate { transform: rotate(180deg); transition: transform 0.2s; }
+
+.topbar-avatar {
+  width: 32px; height: 32px;
+  background: var(--purple-600);
+  color: white;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 700;
+}
+
+/* Dropdown */
+.user-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  padding: 6px;
+  min-width: 180px;
+  z-index: 50;
+  border: 1px solid var(--gray-200);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  text-align: left;
+}
+.menu-item:hover { background: var(--purple-50); color: var(--purple-700); }
+.menu-item.danger { color: var(--red); }
+.menu-item.danger:hover { background: #FEF2F2; }
+
+.menu-divider { height: 1px; background: var(--gray-200); margin: 4px 0; }

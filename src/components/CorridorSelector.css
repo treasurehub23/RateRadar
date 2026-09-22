@@ -1,56 +1,62 @@
 .selector {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto;
-  gap: 12px;
+  gap: 14px;
   background: white;
-  padding: 16px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.08);
   align-items: end;
 }
 
 .selector-field label {
   display: block;
-  font-size: 11px;
+  font-size: 12.5px;
   color: var(--gray-500);
-  margin-bottom: 6px;
-  font-weight: 500;
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .selector-field select,
 .selector-field input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 13px 14px;
   border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 10px;
+  font-size: 15px;
   background: white;
   color: var(--gray-900);
+  font-weight: 500;
 }
 
 .selector-field select:focus,
-.selector-field input:focus { outline: 2px solid var(--purple-100); border-color: var(--purple-500); }
+.selector-field input:focus {
+  outline: 2px solid var(--purple-100);
+  border-color: var(--purple-500);
+}
 
 .amount-input {
   display: flex;
   align-items: center;
   border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  padding-left: 12px;
+  border-radius: 10px;
+  padding-left: 14px;
   background: white;
 }
 
-.amount-input span { color: var(--gray-500); font-size: 13px; }
-.amount-input input { border: none; padding: 10px 12px; width: 100%; font-size: 13px; }
+.amount-input span { color: var(--gray-500); font-size: 15px; font-weight: 600; }
+.amount-input input { border: none; padding: 13px 14px; width: 100%; font-size: 15px; font-weight: 500; }
 .amount-input input:focus { outline: none; }
 .amount-input:focus-within { border-color: var(--purple-500); outline: 2px solid var(--purple-100); }
 
 .btn-primary {
   background: var(--purple-600);
   color: white;
-  padding: 11px 22px;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 14px 26px;
+  border-radius: 10px;
+  font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
   transition: background 0.15s;
