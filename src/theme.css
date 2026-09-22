@@ -1,0 +1,177 @@
+/* ============ DARK MODE OVERRIDES ============ */
+[data-theme="dark"] {
+  --white: #1A1A22;
+  --purple-50: #17141F;
+  --purple-100: #2A1F3D;
+  --purple-500: #A78BFA;
+  --purple-600: #8B5CF6;
+  --purple-700: #A78BFA;
+
+  --gray-100: #23232B;
+  --gray-200: #2E2E38;
+  --gray-400: #8B8B96;
+  --gray-500: #A0A0AC;
+  --gray-700: #D1D1DA;
+  --gray-900: #F5F5F8;
+
+  --green-bg: #163D2C;
+  --amber-bg: #3D2E10;
+  --red-bg: #3D1A1A;
+  --blue-bg: #15284A;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+[data-theme="dark"] body {
+  background: #0E0E14;
+  color: #F5F5F8;
+}
+
+[data-theme="dark"] .sidebar {
+  background: var(--white);
+  border-right-color: var(--gray-200);
+}
+
+[data-theme="dark"] .sidebar-promo {
+  background: var(--purple-50);
+}
+
+[data-theme="dark"] .topbar-user {
+  background: var(--white);
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .hero {
+  background: linear-gradient(135deg, #17141F 0%, #1F1A2E 100%);
+}
+
+[data-theme="dark"] .hero h1,
+[data-theme="dark"] .hero p {
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .selector,
+[data-theme="dark"] .comparison-table,
+[data-theme="dark"] .side-card,
+[data-theme="dark"] .popular-card,
+[data-theme="dark"] .corridor-row,
+[data-theme="dark"] .alerts-list,
+[data-theme="dark"] .alert-threshold,
+[data-theme="dark"] .profile-card,
+[data-theme="dark"] .profile-header,
+[data-theme="dark"] .auth-card,
+[data-theme="dark"] .modal-card,
+[data-theme="dark"] .table-empty {
+  background: var(--white);
+  border-color: var(--gray-200);
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .selector-field select,
+[data-theme="dark"] .selector-field input,
+[data-theme="dark"] .amount-input,
+[data-theme="dark"] .pref-row select {
+  background: #23232B;
+  color: var(--gray-900);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .table-header {
+  background: #23232B;
+  color: var(--gray-500);
+}
+
+[data-theme="dark"] .table-row {
+  border-top-color: var(--gray-100);
+}
+
+[data-theme="dark"] .table-row.best {
+  background: linear-gradient(90deg, #2A1F3D 0%, #1A1A22 40%);
+}
+
+[data-theme="dark"] .table-row:hover {
+  background: #23232B;
+}
+
+[data-theme="dark"] .summary-row,
+[data-theme="dark"] .info-row {
+  border-bottom-color: var(--gray-100);
+}
+
+[data-theme="dark"] .best-option-box {
+  background: var(--purple-50);
+  border-color: var(--purple-100);
+}
+
+[data-theme="dark"] .savings-banner {
+  background: linear-gradient(135deg, #17141F 0%, #1F1A2E 100%);
+  border-color: var(--purple-100);
+}
+
+[data-theme="dark"] .flag-chip {
+  background: var(--white);
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .rate-preview {
+  background: var(--white);
+  color: var(--gray-900);
+}
+
+[data-theme="dark"] .rp-label { color: var(--gray-500); }
+[data-theme="dark"] .rp-value { color: var(--gray-900); }
+
+[data-theme="dark"] .filter-tab {
+  background: var(--white);
+  color: var(--gray-700);
+  border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .filter-tab.active {
+  background: var(--purple-600);
+  color: white;
+}
+
+[data-theme="dark"] .alert-row {
+  border-bottom-color: var(--gray-100);
+}
+
+[data-theme="dark"] .alert-row:hover {
+  background: #23232B;
+}
+
+[data-theme="dark"] .alert-title { color: var(--gray-900); }
+[data-theme="dark"] .alert-body { color: var(--gray-500); }
+
+[data-theme="dark"] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+[data-theme="dark"] .reliability-box {
+  filter: brightness(0.85);
+}
+
+[data-theme="dark"] .modal-note {
+  background: var(--purple-50);
+  color: var(--gray-700);
+}
+
+[data-theme="dark"] .menu-item {
+  color: var(--gray-700);
+}
+[data-theme="dark"] .menu-item:hover {
+  background: var(--purple-50);
+}
+[data-theme="dark"] .user-menu {
+  background: var(--white);
+  border-color: var(--gray-200);
+}
+[data-theme="dark"] .menu-divider {
+  background: var(--gray-200);
+}
+
+[data-theme="dark"] .profile-cover {
+  background: linear-gradient(135deg, #4C1D95 0%, #6D28D9 100%);
+}

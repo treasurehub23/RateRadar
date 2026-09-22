@@ -116,3 +116,17 @@
 .menu-item.danger:hover { background: var(--red-bg); }
 
 .menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
+.topbar-theme {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gray-700);
+  display: grid;
+  place-items: center;
+  transition: all 0.15s;
+}
+.topbar-theme:hover {
+  background: var(--purple-50);
+  color: var(--purple-600);
+}

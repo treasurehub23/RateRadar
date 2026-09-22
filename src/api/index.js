@@ -3,80 +3,84 @@ import { CORRIDORS } from '../constants'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
-// ---- MOCK DATA (fallback so demo never breaks) ----
-export const MOCK_COMPARISON = {
-  corridor: 'UK-NG',
-  amount: 1000,
-  currency: 'GBP',
-  updatedAt: new Date().toISOString(),
-  routes: [
-    {
-      provider: 'Binance P2P',
-      method: 'P2P (Merchant)',
-      rate: 1680,
-      feePercent: -0.5,
-      feeFlat: 500,
-      feeCurrency: 'NGN',
-      received: 1680000,
-      totalCost: 1688000,
-      reliability: 'medium',
-      bestRate: true,
-      // merchant detail only exists on P2P rows — this is what the "View" modal reads from
-      merchant: {
-        completionRate: 68,
-        avgReleaseTime: '7 min',
-        totalTrades: 1248,
-        reviewScore: 4.2,
-        reviewCount: 312,
-        advice: 'This merchant has a medium reliability score. Consider Wise for a safer option, though the rate is slightly lower.',
-      },
-    },
-    {
-      provider: 'Lemfi',
-      method: 'Transfer',
-      rate: 1620,
-      feePercent: -1.0,
-      feeFlat: 1000,
-      feeCurrency: 'NGN',
-      received: 1620000,
-      totalCost: 1636000,
-      reliability: 'high',
-    },
-    {
-      provider: 'Sendwave',
-      method: 'Transfer',
-      rate: 1590,
-      feePercent: -1.5,
-      feeFlat: 2000,
-      feeCurrency: 'NGN',
-      received: 1590000,
-      totalCost: 1618000,
-      reliability: 'medium',
-    },
-    {
-      provider: 'Wise',
-      method: 'Transfer',
-      rate: 1580,
-      feePercent: -1.2,
-      feeFlat: 2500,
-      feeCurrency: 'NGN',
-      received: 1580000,
-      totalCost: 1598500,
-      reliability: 'high',
-    },
-    {
-      provider: 'GTBank',
-      method: 'Bank Transfer',
-      rate: 1520,
-      feePercent: -2.5,
-      feeFlat: 3000,
-      feeCurrency: 'NGN',
-      received: 1520000,
-      totalCost: 1559000,
-      reliability: 'high',
-    },
-  ],
+// ---------- BASE RATES PER CORRIDOR (at 1000 sender units) ----------
+const BASE_RATES = {
+  'UK-NG':  { currency: 'GBP', toCode: 'NGN',  symbol: '₦', routes: [
+    { provider: 'Binance P2P', method: 'P2P (Merchant)', rate: 1680, feePercent: -0.5, feeFlat: 500,  reliability: 'medium', bestRate: true },
+    { provider: 'Lemfi',       method: 'Transfer',       rate: 1620, feePercent: -1.0, feeFlat: 1000, reliability: 'high' },
+    { provider: 'Sendwave',    method: 'Transfer',       rate: 1590, feePercent: -1.5, feeFlat: 2000, reliability: 'medium' },
+    { provider: 'Wise',        method: 'Transfer',       rate: 1580, feePercent: -1.2, feeFlat: 2500, reliability: 'high' },
+    { provider: 'GTBank',      method: 'Bank Transfer',  rate: 1520, feePercent: -2.5, feeFlat: 3000, reliability: 'high' },
+  ]},
+  'USA-GH': { currency: 'USD', toCode: 'GHS',  symbol: 'GH₵', routes: [
+    { provider: 'Binance P2P', method: 'P2P (Merchant)', rate: 15.6, feePercent: -0.4, feeFlat: 5,  reliability: 'medium', bestRate: true },
+    { provider: 'Lemfi',       method: 'Transfer',       rate: 15.1, feePercent: -0.9, feeFlat: 8,  reliability: 'high' },
+    { provider: 'Sendwave',    method: 'Transfer',       rate: 14.9, feePercent: -1.4, feeFlat: 12, reliability: 'medium' },
+    { provider: 'Wise',        method: 'Transfer',       rate: 14.8, feePercent: -1.1, feeFlat: 10, reliability: 'high' },
+    { provider: 'GTBank',      method: 'Bank Transfer',  rate: 14.2, feePercent: -2.3, feeFlat: 20, reliability: 'high' },
+  ]},
+  'CAD-KE': { currency: 'CAD', toCode: 'KES',  symbol: 'KSh ', routes: [
+    { provider: 'Binance P2P', method: 'P2P (Merchant)', rate: 95.5, feePercent: -0.5, feeFlat: 30, reliability: 'medium', bestRate: true },
+    { provider: 'Lemfi',       method: 'Transfer',       rate: 92.4, feePercent: -1.0, feeFlat: 50, reliability: 'high' },
+    { provider: 'Sendwave',    method: 'Transfer',       rate: 91.0, feePercent: -1.5, feeFlat: 80, reliability: 'medium' },
+    { provider: 'Wise',        method: 'Transfer',       rate: 90.2, feePercent: -1.2, feeFlat: 60, reliability: 'high' },
+    { provider: 'GTBank',      method: 'Bank Transfer',  rate: 87.0, feePercent: -2.5, feeFlat: 100, reliability: 'high' },
+  ]},
+  'EU-NG':  { currency: 'EUR', toCode: 'NGN',  symbol: '₦', routes: [
+    { provider: 'Binance P2P', method: 'P2P (Merchant)', rate: 1720, feePercent: -0.5, feeFlat: 500,  reliability: 'medium', bestRate: true },
+    { provider: 'Lemfi',       method: 'Transfer',       rate: 1680, feePercent: -1.0, feeFlat: 1000, reliability: 'high' },
+    { provider: 'Sendwave',    method: 'Transfer',       rate: 1650, feePercent: -1.5, feeFlat: 2000, reliability: 'medium' },
+    { provider: 'Wise',        method: 'Transfer',       rate: 1640, feePercent: -1.2, feeFlat: 2500, reliability: 'high' },
+    { provider: 'GTBank',      method: 'Bank Transfer',  rate: 1580, feePercent: -2.5, feeFlat: 3000, reliability: 'high' },
+  ]},
 }
+
+const MERCHANT_META = {
+  completionRate: 68,
+  avgReleaseTime: '7 min',
+  totalTrades: 1248,
+  reviewScore: 4.2,
+  reviewCount: 312,
+  advice: 'This merchant has a medium reliability score. Consider Wise for a safer option, though the rate is slightly lower.',
+}
+
+// ---------- BUILD A RESPONSE FOR ANY CORRIDOR + AMOUNT ----------
+function buildMockComparison(corridor, amount) {
+  const base = BASE_RATES[corridor] || BASE_RATES['UK-NG']
+  const scale = amount / 1000
+
+  const routes = base.routes.map((r) => {
+    const received = Math.round(r.rate * amount)
+    const feeFlat = Math.round(r.feeFlat * scale)
+    const totalCost = Math.round(received + Math.abs(feeFlat))
+    return {
+      provider: r.provider,
+      method: r.method,
+      rate: r.rate,
+      feePercent: r.feePercent,
+      feeFlat,
+      feeCurrency: base.toCode,
+      received,
+      totalCost,
+      reliability: r.reliability,
+      bestRate: r.bestRate || false,
+      ...(r.provider === 'Binance P2P' ? { merchant: MERCHANT_META } : {}),
+    }
+  })
+
+  return {
+    corridor,
+    amount,
+    currency: base.currency,
+    toCode: base.toCode,
+    symbol: base.symbol,
+    updatedAt: new Date().toISOString(),
+    routes,
+  }
+}
+
+// ---------- MOCK CONSTANTS (fallback data) ----------
+export const MOCK_COMPARISON = buildMockComparison('UK-NG', 1000)
 
 export const MOCK_ALERTS = [
   { id: 1, type: 'rate-spread', severity: 'high', title: 'High Rate Spread Detected', body: 'The difference between the best and worst rate for UK → NG is 8.4% (usually < 5%).', time: 'Today, 10:24 AM' },
@@ -101,13 +105,20 @@ export const MOCK_TREND = [
   { day: 'Aug 27', rate: 1680 },
 ]
 
-// ---- API CALLS (fall back to mock if backend down) ----
+export const MOCK_CORRIDORS = [
+  { id: 1, fromCode: 'GBP', toCode: 'NGN', fromLabel: 'United Kingdom (GBP)', toLabel: 'Nigeria (NGN)', lastUsed: 'Aug 28, 2025', default: true },
+  { id: 2, fromCode: 'CAD', toCode: 'KES', fromLabel: 'Canada (CAD)', toLabel: 'Kenya (KES)', lastUsed: 'Aug 26, 2025' },
+  { id: 3, fromCode: 'USD', toCode: 'GHS', fromLabel: 'USA (USD)', toLabel: 'Ghana (GHS)', lastUsed: 'Aug 24, 2025' },
+  { id: 4, fromCode: 'EUR', toCode: 'NGN', fromLabel: 'EU (EUR)', toLabel: 'Nigeria (NGN)', lastUsed: 'Aug 20, 2025' },
+]
+
+// ---------- API CALLS ----------
 export const getComparison = async (corridor, amount) => {
   try {
     const res = await axios.get(`${API}/compare`, { params: { corridor, amount }, timeout: 4000 })
     return res.data
   } catch {
-    return MOCK_COMPARISON
+    return buildMockComparison(corridor, amount)
   }
 }
 
@@ -120,8 +131,15 @@ export const getAlerts = async () => {
   }
 }
 
-// live summary for all 4 corridors at once — backend endpoint per the team breakdown doc,
-// falls back to the static popularAmount on each corridor if the backend isn't up yet
+export const getCorridors = async () => {
+  try {
+    const res = await axios.get(`${API}/corridors`, { timeout: 4000 })
+    return res.data
+  } catch {
+    return MOCK_CORRIDORS
+  }
+}
+
 export const getPopularCorridors = async () => {
   try {
     const res = await axios.get(`${API}/corridors/popular`, { timeout: 4000 })
@@ -133,14 +151,16 @@ export const getPopularCorridors = async () => {
 
 export const getTrend = async () => MOCK_TREND
 
-// ---- "My Corridors" — frontend-only, no backend involved (see team breakdown doc) ----
+// ---------- "My Corridors" — localStorage only ----------
 const SAVED_KEY = 'rateradar_saved_corridors'
 
 const defaultSaved = () => CORRIDORS.map((c, i) => ({
   id: c.value,
-  fromFlag: c.fromFlag, toFlag: c.toFlag,
+  fromFlag: c.fromFlag,
+  toFlag: c.toFlag,
   label: `${c.fromLabel.split(' (')[0]} → ${c.toLabel.split(' (')[0]}`,
-  fromCode: c.fromCode, toCode: c.toCode,
+  fromCode: c.fromCode,
+  toCode: c.toCode,
   lastUsed: '—',
   default: i === 0,
 }))
@@ -155,7 +175,7 @@ export const getSavedCorridors = () => {
     }
     return JSON.parse(raw)
   } catch {
-    return defaultSaved() // storage blocked or corrupted — still show something instead of an empty page
+    return defaultSaved()
   }
 }
 
@@ -166,9 +186,14 @@ export const addSavedCorridor = (corridorValue) => {
     const c = CORRIDORS.find((x) => x.value === corridorValue)
     if (!c) return existing
     const updated = [...existing, {
-      id: c.value, fromFlag: c.fromFlag, toFlag: c.toFlag,
+      id: c.value,
+      fromFlag: c.fromFlag,
+      toFlag: c.toFlag,
       label: `${c.fromLabel.split(' (')[0]} → ${c.toLabel.split(' (')[0]}`,
-      fromCode: c.fromCode, toCode: c.toCode, lastUsed: 'Just now', default: false,
+      fromCode: c.fromCode,
+      toCode: c.toCode,
+      lastUsed: 'Just now',
+      default: false,
     }]
     localStorage.setItem(SAVED_KEY, JSON.stringify(updated))
     return updated

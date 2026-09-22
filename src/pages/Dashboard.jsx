@@ -28,9 +28,9 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    handleCompare()
-    // eslint-disable-next-line
-  }, [])
+  handleCompare()
+  // eslint-disable-next-line
+}, [corridor, amount])
 
   const jumpToCorridor = (value) => {
     setCorridor(value)
@@ -106,8 +106,8 @@ export default function Dashboard() {
             <div className="rp-row">
               <span className="rp-label">Get</span>
               <span className="rp-value big">
-                {best ? best.received.toLocaleString() : '—'} {selected.toCode}
-              </span>
+  {best ? Math.round(best.received * (amount / 1000)).toLocaleString() : '—'} {selected.toCode}
+</span>
             </div>
           </div>
         </div>
