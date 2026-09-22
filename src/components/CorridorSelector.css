@@ -2,10 +2,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto;
   gap: 14px;
-  background: white;
+  background: var(--card);
   padding: 18px;
   border-radius: 14px;
-  box-shadow: 0 4px 20px rgba(124,58,237,0.08);
+  box-shadow: var(--shadow-md);
   align-items: end;
 }
 
@@ -19,22 +19,48 @@
   letter-spacing: 0.4px;
 }
 
-.selector-field select,
-.selector-field input {
-  width: 100%;
-  padding: 13px 14px;
+.select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   border: 1px solid var(--gray-200);
   border-radius: 10px;
-  font-size: 15px;
-  background: white;
-  color: var(--gray-900);
-  font-weight: 500;
+  padding: 0 12px;
+  background: var(--card);
+  transition: all 0.15s;
 }
 
-.selector-field select:focus,
-.selector-field input:focus {
-  outline: 2px solid var(--purple-100);
+.select-wrap:focus-within {
   border-color: var(--purple-500);
+  box-shadow: 0 0 0 3px var(--purple-100);
+}
+
+.select-flag {
+  width: 22px;
+  height: 16px;
+  border-radius: 3px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.select-wrap select {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 13px 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  width: 100%;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select-chevron {
+  color: var(--gray-500);
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .amount-input {
@@ -43,13 +69,26 @@
   border: 1px solid var(--gray-200);
   border-radius: 10px;
   padding-left: 14px;
-  background: white;
+  background: var(--card);
+  transition: all 0.15s;
+}
+
+.amount-input:focus-within {
+  border-color: var(--purple-500);
+  box-shadow: 0 0 0 3px var(--purple-100);
 }
 
 .amount-input span { color: var(--gray-500); font-size: 15px; font-weight: 600; }
-.amount-input input { border: none; padding: 13px 14px; width: 100%; font-size: 15px; font-weight: 500; }
-.amount-input input:focus { outline: none; }
-.amount-input:focus-within { border-color: var(--purple-500); outline: 2px solid var(--purple-100); }
+.amount-input input {
+  border: none;
+  padding: 13px 14px;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text);
+  outline: none;
+}
 
 .btn-primary {
   background: var(--purple-600);

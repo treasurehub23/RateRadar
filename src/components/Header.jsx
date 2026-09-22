@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bell, ChevronDown, LogOut, User } from 'lucide-react'
 import './Header.css'
+import ThemeToggle from './ThemeToggle'
 
 export default function Header() {
   const [loggedIn, setLoggedIn] = useState(true)
@@ -30,6 +31,7 @@ export default function Header() {
 
       {loggedIn && (
         <>
+        <ThemeToggle />
           <button className="topbar-bell"><Bell size={20} strokeWidth={1.8} /></button>
 
           <div className="topbar-user-wrap" ref={menuRef}>

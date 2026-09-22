@@ -1,61 +1,41 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import ComparisonTable from '../components/ComparisonTable'
 import CorridorSelector from '../components/CorridorSelector'
+import MerchantModal from '../components/MerchantModal'
 import { getComparison, MOCK_TREND } from '../api'
+import { CORRIDORS, getCorridor } from '../constants'
 import './Dashboard.css'
 
-function GlobeTexture() {
-  return (
-    <svg viewBox="0 0 400 400" className="globe-svg" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <radialGradient id="ocean" cx="35%" cy="30%" r="80%">
-          <stop offset="0%" stopColor="#A78BFA" />
-          <stop offset="55%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#5B21B6" />
-        </radialGradient>
-      </defs>
-      <circle cx="200" cy="200" r="200" fill="url(#ocean)" />
-
-      <g fill="#DDD6FE" opacity="0.75">
-        {/* North America */}
-        <ellipse cx="85" cy="140" rx="42" ry="55" />
-        <ellipse cx="115" cy="180" rx="22" ry="18" />
-        {/* South America */}
-        <ellipse cx="135" cy="275" rx="26" ry="50" />
-        {/* Europe */}
-        <ellipse cx="225" cy="118" rx="36" ry="24" />
-        {/* Africa */}
-        <ellipse cx="225" cy="235" rx="40" ry="62" />
-        {/* Asia */}
-        <ellipse cx="320" cy="155" rx="72" ry="55" />
-        {/* Australia */}
-        <ellipse cx="345" cy="290" rx="30" ry="20" />
-      </g>
-
-      <g stroke="#EDE9FE" strokeWidth="0.5" fill="none" opacity="0.28">
-        <ellipse cx="200" cy="200" rx="60" ry="200" />
-        <ellipse cx="200" cy="200" rx="120" ry="200" />
-        <ellipse cx="200" cy="200" rx="180" ry="200" />
-        <line x1="0" y1="200" x2="400" y2="200" />
-        <line x1="0" y1="140" x2="400" y2="140" />
-        <line x1="0" y1="260" x2="400" y2="260" />
-      </g>
-    </svg>
-  )
-}
+const FLAG_ISO = { GBP: 'gb', USD: 'us', CAD: 'ca', EUR: 'eu', KES: 'ke', NGN: 'ng' }
 
 export default function Dashboard() {
   const [corridor, setCorridor] = useState('UK-NG')
   const [amount, setAmount] = useState(1000)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [openMerchant, setOpenMerchant] = useState(null)
+
+  const selected = getCorridor(corridor)
+  const fromISO = FLAG_ISO[selected.fromCode] || 'gb'
+  const toISO = FLAG_ISO[selected.toCode] || 'ng'
 
   const handleCompare = async () => {
     setLoading(true)
     const res = await getComparison(corridor, amount)
     setData(res)
     setLoading(false)
+  }
+
+  useEffect(() => {
+    handleCompare()
+    // eslint-disable-next-line
+  }, [])
+
+  const jumpToCorridor = (value) => {
+    setCorridor(value)
+    setLoading(true)
+    getComparison(value, amount).then((res) => { setData(res); setLoading(false) })
   }
 
   const best = data?.routes?.[0]
@@ -66,31 +46,38 @@ export default function Dashboard() {
     <div>
       <div className="hero">
         <div className="hero-text">
-          <h1>Find the best way<br />to send money across borders</h1>
+          <h1>Find the <span className="accent">best</span> way<br />to send money across borders</h1>
           <p>Compare exchange rates, fees and total amount across multiple providers. Get the best deal, with confidence.</p>
-          <CorridorSelector corridor={corridor} setCorridor={setCorridor} amount={amount} setAmount={setAmount} onCompare={handleCompare} loading={loading} />
+          <CorridorSelector
+            corridor={corridor}
+            setCorridor={setCorridor}
+            amount={amount}
+            setAmount={setAmount}
+            onCompare={handleCompare}
+            loading={loading}
+          />
         </div>
 
         <div className="hero-visual">
-          <div className="globe">
-            <div className="globe-track">
-              <GlobeTexture />
-              <GlobeTexture />
-            </div>
-            <div className="globe-shine" />
+          <div className="earth-sphere">
+            <div className="earth-track" />
+            <div className="earth-shade" />
           </div>
 
-          <div className="hero-badge hero-badge-left">£</div>
-          <div className="hero-badge hero-badge-right">₦</div>
+          <div className="flag-chip">
+            <img src={`https://flagcdn.com/w40/${fromISO}.png`} alt="" className="flag-img" />
+            <span className="flag-code">{selected.fromCode}</span>
+          </div>
 
-          <svg className="hero-arrow" viewBox="0 0 100 60">
-            <path d="M 20 50 Q 40 10 85 15" stroke="#7C3AED" strokeWidth="2" fill="none" strokeDasharray="4 4" />
-            <path d="M 85 15 L 76 10 L 80 22 Z" fill="#7C3AED" />
-          </svg>
-
-          <div className="hero-note">
-            <span>Better rates.</span>
-            <span>More value.</span>
+          <div className="rate-preview">
+            <div className="rp-row">
+              <span className="rp-label">Send</span>
+              <span className="rp-value">{selected.currency}{amount.toLocaleString()}</span>
+            </div>
+            <div className="rp-row">
+              <span className="rp-label">Get</span>
+              <span className="rp-value big">{best ? best.received.toLocaleString() : '—'} {selected.toCode}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -98,16 +85,24 @@ export default function Dashboard() {
       <div className="dashboard-grid">
         <div className="dashboard-main">
           <h2 className="section-title">Comparison Results</h2>
-          <p className="section-sub">Showing the best rates for £{amount.toLocaleString()} from United Kingdom to Nigeria</p>
+          <p className="section-sub">
+            Showing the best rates for {selected.currency}{amount.toLocaleString()} from {selected.fromLabel.split(' (')[0]} to {selected.toLabel.split(' (')[0]}
+          </p>
 
-          <ComparisonTable routes={data?.routes || []} loading={loading} />
+          <ComparisonTable
+            routes={data?.routes || []}
+            loading={loading}
+            rateUnit={`1 ${selected.fromCode}`}
+            toCode={selected.toCode}
+            onView={(route) => setOpenMerchant(route)}
+          />
 
           {savings > 0 && (
             <div className="savings-banner">
               <span className="savings-icon">💡</span>
               <div>
-                <strong>You could get ₦{savings.toLocaleString()} more with {best.provider}!</strong>
-                <p>Compared to the bank, you will receive ₦{best.received.toLocaleString()} instead of ₦{worst.received.toLocaleString()}.</p>
+                <strong>You could get {savings.toLocaleString()} {selected.toCode} more with {best.provider}!</strong>
+                <p>Compared to the worst option, you'll receive {best.received.toLocaleString()} instead of {worst.received.toLocaleString()} {selected.toCode}.</p>
               </div>
               <button className="btn-outline">See Details</button>
             </div>
@@ -115,35 +110,39 @@ export default function Dashboard() {
 
           <h3 className="section-title" style={{ marginTop: 40 }}>Popular Corridors</h3>
           <div className="popular-grid">
-            {[
-              { flag: '🇺🇸', from: 'USA', to: 'Nigeria', code: 'USD → NGN', amount: '₦1,580,000' },
-              { flag: '🇨🇦', from: 'Canada', to: 'Nigeria', code: 'CAD → NGN', amount: '₦1,620,000' },
-              { flag: '🇬🇧', from: 'UK', to: 'Nigeria', code: 'GBP → NGN', amount: '₦1,680,000' },
-              { flag: '🇪🇺', from: 'EU', to: 'Nigeria', code: 'EUR → NGN', amount: '₦1,645,000' },
-            ].map((c) => (
-              <div key={c.from} className="popular-card">
-                <div className="popular-flag">{c.flag}</div>
-                <div>
-                  <div className="popular-label">{c.from} → {c.to}</div>
-                  <div className="popular-code">{c.code}</div>
-                </div>
-                <div className="popular-amount">{c.amount}</div>
-              </div>
-            ))}
+            {CORRIDORS.map((c) => {
+              const iso = FLAG_ISO[c.fromCode] || 'gb'
+              return (
+                <button key={c.value} className="popular-card" onClick={() => jumpToCorridor(c.value)}>
+                  <img src={`https://flagcdn.com/w40/${iso}.png`} alt="" className="popular-flag-img" />
+                  <div>
+                    <div className="popular-label">{c.fromLabel.split(' (')[0]} → {c.toLabel.split(' (')[0]}</div>
+                    <div className="popular-code">{c.fromCode} → {c.toCode}</div>
+                  </div>
+                  <div className="popular-amount">{c.popularAmount}</div>
+                </button>
+              )
+            })}
           </div>
         </div>
 
         <aside className="dashboard-side">
           <div className="side-card">
             <h3>Transfer Summary</h3>
-            <div className="summary-row"><span>From</span><strong>🇬🇧 United Kingdom (GBP)</strong></div>
-            <div className="summary-row"><span>To</span><strong>🇳🇬 Nigeria (NGN)</strong></div>
-            <div className="summary-row"><span>Amount</span><strong>£{amount.toLocaleString()}</strong></div>
+            <div className="summary-row">
+              <span>From</span>
+              <strong><img src={`https://flagcdn.com/w20/${fromISO}.png`} alt="" className="inline-flag" /> {selected.fromLabel}</strong>
+            </div>
+            <div className="summary-row">
+              <span>To</span>
+              <strong><img src={`https://flagcdn.com/w20/${toISO}.png`} alt="" className="inline-flag" /> {selected.toLabel}</strong>
+            </div>
+            <div className="summary-row"><span>Amount</span><strong>{selected.currency}{amount.toLocaleString()}</strong></div>
             {best && (
               <div className="best-option-box">
                 <div className="bo-label">Best Option</div>
                 <div className="bo-provider">{best.provider}</div>
-                <div className="bo-amount">You will receive ₦{best.received.toLocaleString()}</div>
+                <div className="bo-amount">You'll receive {best.received.toLocaleString()} {selected.toCode}</div>
               </div>
             )}
           </div>
@@ -168,6 +167,8 @@ export default function Dashboard() {
           </div>
         </aside>
       </div>
+
+      {openMerchant && <MerchantModal route={openMerchant} onClose={() => setOpenMerchant(null)} />}
     </div>
   )
 }

@@ -1,8 +1,9 @@
 .comparison-table {
-  background: white;
+  background: var(--card);
   border-radius: 16px;
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border);
   overflow: hidden;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .table-header,
@@ -18,32 +19,45 @@
   background: var(--gray-100);
   font-size: 12px;
   font-weight: 700;
-  color: var(--gray-500);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .table-row {
-  border-top: 1px solid var(--gray-100);
+  border-top: 1px solid var(--border);
   font-size: 14.5px;
+  color: var(--text);
   transition: background 0.15s;
 }
 
 .table-row:hover { background: var(--purple-50); }
-.table-row.best { background: linear-gradient(90deg, #F5F3FF 0%, #FFFFFF 40%); border-left: 4px solid var(--purple-600); }
+.table-row.best {
+  background: var(--purple-50);
+  border-left: 4px solid var(--purple-600);
+}
 
 .cell-provider { display: flex; align-items: center; gap: 14px; }
 
 .provider-logo {
-  width: 42px; height: 42px;
+  width: 42px;
+  height: 42px;
   border-radius: 10px;
-  display: grid; place-items: center;
-  color: white; font-weight: 700; font-size: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
   flex-shrink: 0;
+  overflow: hidden;
+  padding: 6px;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--text);
 }
+.provider-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
-.provider-name { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 10px; }
-.provider-method { font-size: 12.5px; color: var(--gray-500); margin-top: 3px; }
+.provider-name { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 10px; color: var(--text); }
+.provider-method { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
 
 .best-badge {
   background: var(--purple-600);
@@ -55,8 +69,8 @@
   letter-spacing: 0.4px;
 }
 
-.cell-receive { font-weight: 700; color: var(--gray-900); font-size: 15px; }
-.cell-rate, .cell-fees, .cell-cost { color: var(--gray-700); font-size: 14px; }
+.cell-receive { font-weight: 700; color: var(--text); font-size: 15px; }
+.cell-rate, .cell-fees, .cell-cost { color: var(--text-muted); font-size: 14px; }
 
 .btn-view {
   background: var(--purple-600);
@@ -71,7 +85,7 @@
 .table-skeleton { display: flex; flex-direction: column; gap: 10px; }
 .skel-row {
   height: 68px;
-  background: linear-gradient(90deg, #F3F4F6 0%, #E5E7EB 50%, #F3F4F6 100%);
+  background: linear-gradient(90deg, var(--gray-100) 0%, var(--gray-200) 50%, var(--gray-100) 100%);
   background-size: 200% 100%;
   border-radius: 12px;
   animation: shimmer 1.5s infinite;
@@ -79,21 +93,21 @@
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 .table-empty {
-  background: white;
-  border: 1px dashed var(--gray-200);
+  background: var(--card);
+  border: 1px dashed var(--border);
   border-radius: 16px;
   padding: 56px 40px;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--text-muted);
   font-size: 15px;
 }
 
 @media (max-width: 900px) {
   .table-header { display: none; }
-  .table-row { grid-template-columns: 1fr; padding: 20px; gap: 8px; border-top: 1px solid var(--gray-200); }
-  .table-row .cell-receive::before { content: "You will receive: "; color: var(--gray-500); font-weight: 400; }
-  .table-row .cell-rate::before { content: "Rate: "; color: var(--gray-500); }
-  .table-row .cell-fees::before { content: "Fees: "; color: var(--gray-500); }
-  .table-row .cell-cost::before { content: "Total: "; color: var(--gray-500); }
+  .table-row { grid-template-columns: 1fr; padding: 20px; gap: 8px; }
+  .table-row .cell-receive::before { content: "You will receive: "; color: var(--text-muted); font-weight: 400; }
+  .table-row .cell-rate::before { content: "Rate: "; color: var(--text-muted); }
+  .table-row .cell-fees::before { content: "Fees: "; color: var(--text-muted); }
+  .table-row .cell-cost::before { content: "Total: "; color: var(--text-muted); }
   .cell-action { justify-self: start; }
 }

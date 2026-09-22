@@ -2,19 +2,18 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 16px;
+  gap: 14px;
   padding: 4px 0 20px;
   position: relative;
 }
 
 .topbar-spacer { flex: 1; }
 
-/* Auth buttons */
 .auth-buttons { display: flex; gap: 10px; }
 
 .btn-signin {
   background: transparent;
-  color: var(--purple-700);
+  color: var(--purple-600);
   padding: 10px 20px;
   border-radius: 10px;
   font-size: 14px;
@@ -32,7 +31,6 @@
 }
 .btn-signup:hover { background: var(--purple-700); }
 
-/* Bell */
 .topbar-bell {
   background: transparent;
   width: 40px;
@@ -40,60 +38,64 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: var(--gray-700);
+  color: var(--text-muted);
   position: relative;
 }
-.topbar-bell:hover { background: var(--purple-50); }
+.topbar-bell:hover { background: var(--purple-50); color: var(--purple-600); }
 .topbar-bell::after {
   content: '';
   position: absolute;
-  top: 10px; right: 10px;
-  width: 8px; height: 8px;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
   background: var(--red);
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid var(--card);
 }
 
-/* User pill + dropdown */
 .topbar-user-wrap { position: relative; }
 
 .topbar-user {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: white;
+  background: var(--card);
   padding: 6px 14px 6px 6px;
   border-radius: 30px;
   box-shadow: var(--shadow-sm);
   font-size: 14px;
   font-weight: 600;
-  color: var(--gray-900);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 .topbar-user:hover { box-shadow: var(--shadow-md); }
 
 .topbar-user svg.rotate { transform: rotate(180deg); transition: transform 0.2s; }
 
 .topbar-avatar {
-  width: 32px; height: 32px;
+  width: 32px;
+  height: 32px;
   background: var(--purple-600);
   color: white;
   border-radius: 50%;
-  display: grid; place-items: center;
-  font-size: 11px; font-weight: 700;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
 }
 
-/* Dropdown */
 .user-menu {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: white;
+  background: var(--card);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   padding: 6px;
   min-width: 180px;
   z-index: 50;
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border);
 }
 
 .menu-item {
@@ -106,11 +108,11 @@
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--gray-700);
+  color: var(--text-muted);
   text-align: left;
 }
-.menu-item:hover { background: var(--purple-50); color: var(--purple-700); }
+.menu-item:hover { background: var(--purple-50); color: var(--purple-600); }
 .menu-item.danger { color: var(--red); }
-.menu-item.danger:hover { background: #FEF2F2; }
+.menu-item.danger:hover { background: var(--red-bg); }
 
-.menu-divider { height: 1px; background: var(--gray-200); margin: 4px 0; }
+.menu-divider { height: 1px; background: var(--border); margin: 4px 0; }

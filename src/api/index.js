@@ -1,4 +1,5 @@
 ﻿import axios from 'axios'
+import { CORRIDORS } from '../constants'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
@@ -20,6 +21,15 @@ export const MOCK_COMPARISON = {
       totalCost: 1688000,
       reliability: 'medium',
       bestRate: true,
+      // merchant detail only exists on P2P rows — this is what the "View" modal reads from
+      merchant: {
+        completionRate: 68,
+        avgReleaseTime: '7 min',
+        totalTrades: 1248,
+        reviewScore: 4.2,
+        reviewCount: 312,
+        advice: 'This merchant has a medium reliability score. Consider Wise for a safer option, though the rate is slightly lower.',
+      },
     },
     {
       provider: 'Lemfi',
@@ -103,13 +113,6 @@ export const MOCK_ALERTS = [
   },
 ]
 
-export const MOCK_CORRIDORS = [
-  { id: 1, from: 'UK', to: 'NG', fromFlag: '🇬🇧', toFlag: '🇳🇬', fromCode: 'GBP', toCode: 'NGN', label: 'UK → Nigeria', lastUsed: 'Aug 28, 2025', default: true },
-  { id: 2, from: 'USA', to: 'NG', fromFlag: '🇺🇸', toFlag: '🇳🇬', fromCode: 'USD', toCode: 'NGN', label: 'USA → Nigeria', lastUsed: 'Aug 26, 2025' },
-  { id: 3, from: 'Canada', to: 'NG', fromFlag: '🇨🇦', toFlag: '🇳🇬', fromCode: 'CAD', toCode: 'NGN', label: 'Canada → Nigeria', lastUsed: 'Aug 24, 2025' },
-  { id: 4, from: 'EU', to: 'NG', fromFlag: '🇪🇺', toFlag: '🇳🇬', fromCode: 'EUR', toCode: 'NGN', label: 'EU → Nigeria', lastUsed: 'Aug 20, 2025' },
-]
-
 export const MOCK_TREND = [
   { day: 'Aug 21', rate: 1520 },
   { day: 'Aug 22', rate: 1540 },
@@ -139,13 +142,69 @@ export const getAlerts = async () => {
   }
 }
 
-export const getCorridors = async () => {
+// live summary for all 4 corridors at once — backend endpoint per the team breakdown doc,
+// falls back to the static popularAmount on each corridor if the backend isn't up yet
+export const getPopularCorridors = async () => {
   try {
-    const res = await axios.get(`${API}/corridors`, { timeout: 4000 })
+    const res = await axios.get(`${API}/corridors/popular`, { timeout: 4000 })
     return res.data
   } catch {
-    return MOCK_CORRIDORS
+    return CORRIDORS
   }
 }
 
 export const getTrend = async () => MOCK_TREND
+
+// ---- "My Corridors" — frontend-only, no backend involved (see team breakdown doc) ----
+const SAVED_KEY = 'rateradar_saved_corridors'
+
+const defaultSaved = () => CORRIDORS.map((c, i) => ({
+  id: c.value,
+  fromFlag: c.fromFlag, toFlag: c.toFlag,
+  label: `${c.fromLabel.split(' (')[0]} → ${c.toLabel.split(' (')[0]}`,
+  fromCode: c.fromCode, toCode: c.toCode,
+  lastUsed: '—',
+  default: i === 0,
+}))
+
+export const getSavedCorridors = () => {
+  try {
+    const raw = localStorage.getItem(SAVED_KEY)
+    if (!raw) {
+      const seeded = defaultSaved()
+      localStorage.setItem(SAVED_KEY, JSON.stringify(seeded))
+      return seeded
+    }
+    return JSON.parse(raw)
+  } catch {
+    return defaultSaved() // storage blocked or corrupted — still show something instead of an empty page
+  }
+}
+
+export const addSavedCorridor = (corridorValue) => {
+  try {
+    const existing = getSavedCorridors()
+    if (existing.some((c) => c.id === corridorValue)) return existing
+    const c = CORRIDORS.find((x) => x.value === corridorValue)
+    if (!c) return existing
+    const updated = [...existing, {
+      id: c.value, fromFlag: c.fromFlag, toFlag: c.toFlag,
+      label: `${c.fromLabel.split(' (')[0]} → ${c.toLabel.split(' (')[0]}`,
+      fromCode: c.fromCode, toCode: c.toCode, lastUsed: 'Just now', default: false,
+    }]
+    localStorage.setItem(SAVED_KEY, JSON.stringify(updated))
+    return updated
+  } catch {
+    return getSavedCorridors()
+  }
+}
+
+export const removeSavedCorridor = (id) => {
+  try {
+    const updated = getSavedCorridors().filter((c) => c.id !== id)
+    localStorage.setItem(SAVED_KEY, JSON.stringify(updated))
+    return updated
+  } catch {
+    return getSavedCorridors()
+  }
+}
