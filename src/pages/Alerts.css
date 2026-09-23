@@ -99,3 +99,26 @@
   .alert-row { flex-wrap: wrap; }
   .alert-time { width: 100%; margin-left: 48px; }
 }
+.alerts-header {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.alerts-header h1 {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin: 0 0 8px 0;
+  color: var(--text);
+}
+
+.alerts-header p {
+  display: block;
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  max-width: 640px;
+  line-height: 1.5;
+}

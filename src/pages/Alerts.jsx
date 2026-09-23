@@ -36,10 +36,10 @@ export default function Alerts() {
 
   return (
     <div>
-      <div className="page-header">
-        <h1>🔔 Rate Transparency Alerts</h1>
-        <p>We monitor for unusual rate spreads, hidden fees and important changes so you don't lose money.</p>
-      </div>
+      <div className="alerts-header">
+  <h1>🔔 Rate Transparency Alerts</h1>
+  <p>We monitor for unusual rate spreads, hidden fees and important changes so you don't lose money.</p>
+</div>
 
       <div className="filter-tabs">
         {FILTERS.map((f) => (
