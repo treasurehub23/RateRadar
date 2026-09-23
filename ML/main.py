@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 import uvicorn
-from ML.classes import ExtractFeeInput, FeeResult, AnomalyInput, AnomalyResult
+from ML.classes import ExtractFeeInput, FeeResult, AnomalyInput, AnomalyResult, MerchantInput, MerchantResult
 from dotenv import load_dotenv
 from groq import Groq
 import os
@@ -50,8 +50,6 @@ def extract_fee(data: ExtractFeeInput):
 
 @app.post("/check_anomaly", response_model=AnomalyResult)
 def check_anomaly(input: AnomalyInput):
-    ins_history = True
-    anomaly = False
     if input.recent_rates == [] or input.recent_rates == [0]:
         result = AnomalyResult(
             isAnomaly=False,
@@ -76,3 +74,40 @@ def check_anomaly(input: AnomalyInput):
         insufficient_history= ins_history
         )
     return result
+
+def baseline_reliability(data:MerchantInput):
+    levels = ["Low", "Medium", "High"]  # ordered worst to best
+
+    def downgrade(status: str) -> str:
+        idx = levels.index(status)
+        idx = max(idx - 1, 0)  # move one step down, but not below "Low"
+        return levels[idx]
+    
+    order_count_low = False
+
+    if data.order_count <20:
+        order_count_low = True
+        if data.completion_rate >= 85:
+            status = "High"
+        elif data.completion_rate >= 60:
+            status = "Medium"
+        else:
+            status = "Low"
+    else:
+        if data.completion_rate >= 80:
+            status = "High"
+        elif data.completion_rate >= 50:
+            status = "Medium"
+        else: 
+            status = "Low"
+
+    if data.average_release_time > 30:
+        downgrade(status)
+
+    
+    return {"reliability_status": status, "low_order_count": order_count_low}
+
+@app.post("/score_merchant", response_model=MerchantResult)
+def score_merchant(data:MerchantInput):
+    baseline_reliability(data)
+    
