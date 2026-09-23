@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 import uvicorn
-from ML.classes import ExtractFeeInput, FeeResult, AnomalyInput, AnomalyResult, MerchantInput, MerchantResult
+from ML.classes import Status, ExtractFeeInput, FeeResult, AnomalyInput, AnomalyResult, MerchantInput, MerchantResult
 from dotenv import load_dotenv
 from groq import Groq
 import os
@@ -75,18 +75,20 @@ def check_anomaly(input: AnomalyInput):
         )
     return result
 
-def baseline_reliability(data:MerchantInput):
-    levels = ["Low", "Medium", "High"]  # ordered worst to best
+def baseline_reliability(data:MerchantInput) -> tuple[Status, bool]:
+    levels: tuple[Status, ...] = ("Low", "Medium", "High")  # ordered worst to best
 
-    def downgrade(status: str) -> str:
+    def downgrade(status: Status) -> Status:
         idx = levels.index(status)
         idx = max(idx - 1, 0)  # move one step down, but not below "Low"
         return levels[idx]
     
-    order_count_low = False
+    low_order_count = False
+
+    status: Status
 
     if data.order_count <20:
-        order_count_low = True
+        low_order_count = True
         if data.completion_rate >= 85:
             status = "High"
         elif data.completion_rate >= 60:
@@ -102,12 +104,67 @@ def baseline_reliability(data:MerchantInput):
             status = "Low"
 
     if data.average_release_time > 30:
-        downgrade(status)
+        status = downgrade(status)
 
     
-    return {"reliability_status": status, "low_order_count": order_count_low}
+    return status, low_order_count
+
+
+FALLBACK_REASONS: dict[Status, str] = {
+    "High": "This merchant has a strong completion rate and releases funds quickly.",
+    "Medium": "This merchant is generally reliable, but has a lower completion rate, a slower release time, or limited trade history worth noting.",
+    "Low": "This merchant has a low completion rate, slow fund releases, or too little trade history to fully trust yet.",
+}
 
 @app.post("/score_merchant", response_model=MerchantResult)
 def score_merchant(data:MerchantInput):
-    baseline_reliability(data)
+    reliability_status, low_order_count = baseline_reliability(data)
+    try:
+        reviews_text = "\n".join(f"- {r}" for r in data.recent_reviews) if data.recent_reviews else "No recent reviews available."
+
+        prompt = f"""You are evaluating a P2P crypto merchant for reliability, not rate.
+
+        A rule-based system has already calculated a baseline reliability status of "{reliability_status}" using these numbers:
+        - Completion rate: {data.completion_rate}%
+        - Average release time: {data.average_release_time} minutes
+        - Order count: {data.order_count}
+
+        Recent reviews:
+        {reviews_text}
+
+        Your job:
+        1. Write one short, non-technical sentence explaining the reliability status to a regular user — reference the reviews if they reveal something meaningful.
+        2. You may only DOWNGRADE the baseline status if the reviews reveal a serious, repeated problem the numbers don't show (e.g. multiple recent reports of delays, scams, or failed trades). You may never upgrade it. If you see no reason to downgrade, keep the status exactly as given.
+        3. The status must be exactly one of: "High", "Medium", "Low" — never any other word.
+
+        Respond in JSON only with exactly these keys:
+        {{"reason": "one short sentence", "status": "High" or "Medium" or "Low"}}"""
+
+        response = client.chat.completions.create(model="openai/gpt-oss-20b",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0,
+                    response_format={"type": "json_object"},)
+        raw_text = response.choices[0].message.content
+        if raw_text is None:
+            raise ValueError("The model returned no content")
+        reply = json.loads(raw_text)
+        reason = reply["reason"]
+        new_status = reply["status"]
+        levels: tuple[Status, ...] = ("Low", "Medium", "High")  # ordered worst to best
+        
+        if new_status not in levels or levels.index(new_status) > levels.index(reliability_status):
+            new_status = reliability_status
+        result = MerchantResult(
+            reliability_status=new_status,
+            reason=reason,
+            low_order_count=low_order_count,
+
+        )
+    except Exception as e:
+        result=MerchantResult(reliability_status=reliability_status,
+                              low_order_count=low_order_count,
+                              reason=FALLBACK_REASONS[reliability_status],
+                              error=str(e))
+
+    return result
     
