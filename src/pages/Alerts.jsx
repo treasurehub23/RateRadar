@@ -19,8 +19,18 @@ const FILTERS = [
 export default function Alerts() {
   const [alerts, setAlerts] = useState([])
   const [filter, setFilter] = useState('all')
+  const [threshold, setThreshold] = useState(() => {
+    return Number(localStorage.getItem('alert_threshold') || 5)
+  })
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => { getAlerts().then(setAlerts) }, [])
+
+  const handleUpdate = () => {
+    localStorage.setItem('alert_threshold', threshold)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
 
   const filtered = filter === 'all' ? alerts : alerts.filter((a) => a.type === filter)
 
@@ -63,9 +73,17 @@ export default function Alerts() {
         <h3>⚠ Rate Alert Threshold</h3>
         <p>Get notified when the rate spread is more than:</p>
         <div className="threshold-row">
-          <input type="range" min="1" max="20" defaultValue="5" />
-          <span className="threshold-value">5%</span>
-          <button className="btn-primary">Update</button>
+          <input
+            type="range"
+            min="1"
+            max="20"
+            value={threshold}
+            onChange={(e) => setThreshold(Number(e.target.value))}
+          />
+          <span className="threshold-value">{threshold}%</span>
+          <button className="btn-primary" onClick={handleUpdate}>
+            {saved ? 'Saved ✓' : 'Update'}
+          </button>
         </div>
       </div>
     </div>

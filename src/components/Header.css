@@ -1,23 +1,48 @@
 .topbar {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 14px;
-  padding: 4px 0 20px;
+  gap: 16px;
+  padding: 8px 0 24px;
   position: relative;
 }
 
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.6px;
+  flex-shrink: 0;
+}
+
 .topbar-spacer { flex: 1; }
+
+.topbar-theme {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: white;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.topbar-theme:hover { background: var(--purple-50); color: var(--purple-600); border-color: var(--purple-100); }
+
+[data-theme="dark"] .topbar-theme { background: var(--card); }
 
 .auth-buttons { display: flex; gap: 10px; }
 
 .btn-signin {
   background: transparent;
-  color: var(--purple-600);
+  color: var(--purple-700);
   padding: 10px 20px;
   border-radius: 10px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 .btn-signin:hover { background: var(--purple-50); }
 
@@ -27,31 +52,32 @@
   padding: 10px 20px;
   border-radius: 10px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 .btn-signup:hover { background: var(--purple-700); }
 
 .topbar-bell {
-  background: transparent;
-  width: 40px;
-  height: 40px;
+  background: white;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   color: var(--text-muted);
+  border: 1px solid var(--border);
   position: relative;
 }
 .topbar-bell:hover { background: var(--purple-50); color: var(--purple-600); }
+[data-theme="dark"] .topbar-bell { background: var(--card); }
+
 .topbar-bell::after {
   content: '';
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 8px;
-  height: 8px;
+  top: 10px; right: 10px;
+  width: 8px; height: 8px;
   background: var(--red);
   border-radius: 50%;
-  border: 2px solid var(--card);
+  border: 2px solid white;
 }
 
 .topbar-user-wrap { position: relative; }
@@ -60,43 +86,43 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--card);
+  background: white;
   padding: 6px 14px 6px 6px;
   border-radius: 30px;
-  box-shadow: var(--shadow-sm);
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
   border: 1px solid var(--border);
 }
-.topbar-user:hover { box-shadow: var(--shadow-md); }
+.topbar-user:hover { border-color: var(--purple-100); }
+
+[data-theme="dark"] .topbar-user { background: var(--card); }
 
 .topbar-user svg.rotate { transform: rotate(180deg); transition: transform 0.2s; }
 
 .topbar-avatar {
-  width: 32px;
-  height: 32px;
+  width: 32px; height: 32px;
   background: var(--purple-600);
   color: white;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 11px;
-  font-weight: 700;
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 700;
 }
 
 .user-menu {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: var(--card);
+  background: white;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
   padding: 6px;
   min-width: 180px;
   z-index: 50;
   border: 1px solid var(--border);
 }
+
+[data-theme="dark"] .user-menu { background: var(--card); }
 
 .menu-item {
   display: flex;
@@ -108,25 +134,11 @@
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text);
   text-align: left;
 }
-.menu-item:hover { background: var(--purple-50); color: var(--purple-600); }
+.menu-item:hover { background: var(--purple-50); color: var(--purple-700); }
 .menu-item.danger { color: var(--red); }
-.menu-item.danger:hover { background: var(--red-bg); }
+.menu-item.danger:hover { background: #FEF2F2; }
 
 .menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
-.topbar-theme {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--gray-700);
-  display: grid;
-  place-items: center;
-  transition: all 0.15s;
-}
-.topbar-theme:hover {
-  background: var(--purple-50);
-  color: var(--purple-600);
-}

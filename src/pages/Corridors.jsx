@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MoreVertical, Plus, X } from 'lucide-react'
+import { MoreVertical, Plus, X, TrendingUp, Clock, Trash2 } from 'lucide-react'
 import { getCorridors } from '../api'
 import { FLAG_ISO, CORRIDORS } from '../constants'
 import './Corridors.css'
@@ -38,7 +38,9 @@ export default function Corridors() {
         toCode: c.toCode,
         fromLabel: c.fromLabel,
         toLabel: c.toLabel,
-        lastUsed: '—',
+        lastUsed: 'Just now',
+        lastAmount: c.popularAmount,
+        trend: '+1.2%',
       },
     ]
     persist(next)
@@ -69,6 +71,7 @@ export default function Corridors() {
         {corridors.map((c) => {
           const fromISO = FLAG_ISO[c.fromCode] || 'un'
           const toISO = FLAG_ISO[c.toCode] || 'un'
+          const base = CORRIDORS.find((x) => x.fromCode === c.fromCode && x.toCode === c.toCode)
           return (
             <div key={c.id} className="corridor-row">
               <div className="corridor-flags">
@@ -82,13 +85,27 @@ export default function Corridors() {
                   {c.fromLabel?.split(' (')[0] || c.fromCode} → {c.toLabel?.split(' (')[0] || c.toCode}
                   {c.default && <span className="default-tag">Default</span>}
                 </div>
-                <div className="corridor-code">{c.fromCode} → {c.toCode}</div>
+                <div className="corridor-meta-row">
+                  <span className="corridor-code">{c.fromCode} → {c.toCode}</span>
+                  <span className="corridor-dot">·</span>
+                  <span className="corridor-meta"><Clock size={11} /> {c.lastUsed || 'Not used yet'}</span>
+                  {c.trend && (
+                    <>
+                      <span className="corridor-dot">·</span>
+                      <span className="corridor-trend"><TrendingUp size={11} /> {c.trend} this week</span>
+                    </>
+                  )}
+                </div>
               </div>
 
-              <div className="corridor-last">Last used: {c.lastUsed}</div>
+              <div className="corridor-amount">
+                <span className="corridor-amount-label">Last received</span>
+                <span className="corridor-amount-value">{c.lastAmount || base?.popularAmount || '—'}</span>
+              </div>
+
               <button className="btn-view" onClick={() => handleCompare(c)}>Compare</button>
-              <button className="btn-more" onClick={() => handleRemove(c.id)}>
-                <X size={14} />
+              <button className="btn-more" onClick={() => handleRemove(c.id)} title="Remove">
+                <Trash2 size={14} />
               </button>
             </div>
           )

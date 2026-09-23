@@ -22,17 +22,15 @@
   font-size: 20px;
   font-weight: 800;
   color: var(--text);
+  letter-spacing: -0.5px;
 }
 
-.logo-icon {
-  width: 34px;
-  height: 34px;
-  background: var(--purple-600);
-  color: white;
-  border-radius: 9px;
+.logo-mark {
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
-  font-size: 14px;
+  flex-shrink: 0;
 }
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 4px; }

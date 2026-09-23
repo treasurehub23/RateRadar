@@ -72,10 +72,11 @@
 
 /* Threshold */
 .alert-threshold {
-  background: white;
-  border: 1px solid var(--gray-200);
-  border-radius: 16px;
-  padding: 22px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--border);
 }
 .alert-threshold h3 { font-size: 15.5px; font-weight: 700; margin-bottom: 6px; }
 .alert-threshold p { font-size: 13.5px; color: var(--gray-500); margin-bottom: 16px; }

@@ -1,11 +1,10 @@
 .comparison-table {
-  background: var(--card);
+  background: white;
   border-radius: 16px;
   border: 1px solid var(--border);
   overflow: hidden;
-  transition: background 0.2s, border-color 0.2s;
 }
-
+[data-theme="dark"] .comparison-table { background: var(--card); }
 .table-header,
 .table-row {
   display: grid;

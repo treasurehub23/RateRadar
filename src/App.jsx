@@ -1,6 +1,7 @@
 ﻿import { Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
+import Footer from './components/Footer'
 import Dashboard from './pages/Dashboard'
 import Alerts from './pages/Alerts'
 import Corridors from './pages/Corridors'
@@ -23,8 +24,10 @@ export default function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/alerts" element={<Alerts />} />
               <Route path="/corridors" element={<Corridors />} />
+              <Route path="/saved" element={<Corridors />} />
               <Route path="/profile" element={<Profile />} />
             </Routes>
+            <Footer />
           </main>
         </div>
       } />

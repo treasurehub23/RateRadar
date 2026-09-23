@@ -6,7 +6,23 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div className="logo-icon">▲</div>
+        <div className="logo-mark">
+          <svg viewBox="0 0 40 40" width="36" height="36" fill="none">
+            <defs>
+              <linearGradient id="planeGradLight" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#8B7CF8" />
+                <stop offset="100%" stopColor="#6D5CE7" />
+              </linearGradient>
+              <linearGradient id="planeGradDark" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#4F46E5" />
+                <stop offset="100%" stopColor="#3730A3" />
+              </linearGradient>
+            </defs>
+            <path d="M 5 20 L 34 4 L 20 24 Z" fill="url(#planeGradLight)" />
+            <path d="M 34 4 L 20 24 L 24 36 L 30 30 Z" fill="url(#planeGradDark)" />
+            <path d="M 34 4 L 20 24 L 24 22 Z" fill="#FFFFFF" opacity="0.9" />
+          </svg>
+        </div>
         <span>RateRadar</span>
       </div>
       <nav className="sidebar-nav">

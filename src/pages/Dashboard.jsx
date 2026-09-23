@@ -3,6 +3,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import ComparisonTable from '../components/ComparisonTable'
 import CorridorSelector from '../components/CorridorSelector'
 import MerchantModal from '../components/MerchantModal'
+import PhoneShowcase from '../components/PhoneShowcase'
 import { getComparison, MOCK_TREND } from '../api'
 import { CORRIDORS, getCorridor } from '../constants'
 import './Dashboard.css'
@@ -28,22 +29,18 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-  handleCompare()
-  // eslint-disable-next-line
-}, [corridor, amount])
+    handleCompare()
+    // eslint-disable-next-line
+  }, [corridor, amount])
 
   const jumpToCorridor = (value) => {
     setCorridor(value)
-    setLoading(true)
-    getComparison(value, amount).then((res) => {
-      setData(res)
-      setLoading(false)
-    })
   }
 
   const best = data?.routes?.[0]
   const worst = data?.routes?.[data.routes.length - 1]
   const savings = best && worst ? best.received - worst.received : 0
+  const routes = data?.routes || []
 
   return (
     <div>
@@ -75,45 +72,68 @@ export default function Dashboard() {
             <div className="earth-shade" />
           </div>
 
-          {/* Dashed arcs */}
           <svg className="hero-arcs" viewBox="0 0 400 400" fill="none">
             <path d="M 100 130 Q 60 60 140 40" stroke="#A78BFA" strokeWidth="1.5" strokeDasharray="4 5" />
             <path d="M 300 130 Q 340 60 260 40" stroke="#A78BFA" strokeWidth="1.5" strokeDasharray="4 5" />
             <path d="M 100 270 Q 60 340 140 360" stroke="#A78BFA" strokeWidth="1.5" strokeDasharray="4 5" />
             <path d="M 300 270 Q 340 340 260 360" stroke="#A78BFA" strokeWidth="1.5" strokeDasharray="4 5" />
-            <path d="M 140 40 L 133 44 L 135 36 Z" fill="#A78BFA" />
-            <path d="M 260 40 L 265 46 L 267 38 Z" fill="#A78BFA" />
           </svg>
 
-          {/* From flag */}
           <div className="flag-chip flag-chip-from">
             <img src={`https://flagcdn.com/w40/${fromISO}.png`} alt="" className="flag-img" />
             <span className="flag-code">{selected.fromCode.slice(0, 2).toUpperCase()}</span>
           </div>
 
-          {/* To flag */}
           <div className="flag-chip flag-chip-to">
             <img src={`https://flagcdn.com/w40/${toISO}.png`} alt="" className="flag-img" />
             <span className="flag-code">{selected.toCode.slice(0, 2).toUpperCase()}</span>
           </div>
 
-          {/* Rate preview */}
-          <div className="rate-preview">
-            <div className="rp-row">
-              <span className="rp-label">Send</span>
-              <span className="rp-value">{selected.currency}{amount.toLocaleString()}</span>
+          <div className="hero-stack">
+            <div className="stack-card stack-back">
+              <div className="stack-head">
+                <span className="stack-dot" />
+                <span>All providers</span>
+              </div>
+              {routes.slice(0, 4).map((r) => (
+                <div key={r.provider} className="stack-row">
+                  <span>{r.provider}</span>
+                  <strong>{r.received.toLocaleString()}</strong>
+                </div>
+              ))}
+              {routes.length === 0 && (
+                <>
+                  <div className="stack-row"><span>Binance P2P</span><strong>1,680,000</strong></div>
+                  <div className="stack-row"><span>Lemfi</span><strong>1,620,000</strong></div>
+                  <div className="stack-row"><span>Wise</span><strong>1,580,000</strong></div>
+                  <div className="stack-row"><span>GTBank</span><strong>1,520,000</strong></div>
+                </>
+              )}
             </div>
-            <div className="rp-row">
-              <span className="rp-label">Get</span>
-              <span className="rp-value big">
-  {best ? Math.round(best.received * (amount / 1000)).toLocaleString() : '—'} {selected.toCode}
-</span>
+
+            <div className="stack-card stack-front">
+              <div className="stack-head">
+                <span className="stack-dot stack-dot-live" />
+                <span>Live rate</span>
+              </div>
+              <div className="stack-big">
+                {best ? `₦${best.rate.toLocaleString()}` : '₦1,680'}
+                <small>/{selected.fromCode.slice(0, 2)}</small>
+              </div>
+              <div className="stack-sub">
+                {best ? `Best on ${best.provider}` : 'Best on Binance P2P'}
+              </div>
+              {savings > 0 && (
+                <div className="stack-badge">
+                  Save {savings.toLocaleString()} {selected.toCode}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* MAIN GRID */}
+      {/* MAIN GRID — Comparison Results + Sidebar */}
       <div className="dashboard-grid">
         <div className="dashboard-main">
           <h2 className="section-title">Comparison Results</h2>
@@ -123,7 +143,7 @@ export default function Dashboard() {
           </p>
 
           <ComparisonTable
-            routes={data?.routes || []}
+            routes={routes}
             loading={loading}
             rateUnit={`1 ${selected.fromCode}`}
             toCode={selected.toCode}
@@ -145,38 +165,9 @@ export default function Dashboard() {
               <button className="btn-outline">See Details</button>
             </div>
           )}
-
-          <h3 className="section-title" style={{ marginTop: 40 }}>Popular Corridors</h3>
-          <div className="popular-grid">
-            {CORRIDORS.map((c) => {
-              const iso = FLAG_ISO[c.fromCode] || 'gb'
-              return (
-                <button
-                  key={c.value}
-                  className="popular-card"
-                  onClick={() => jumpToCorridor(c.value)}
-                >
-                  <img
-                    src={`https://flagcdn.com/w40/${iso}.png`}
-                    alt=""
-                    className="popular-flag-img"
-                  />
-                  <div>
-                    <div className="popular-label">
-                      {c.fromLabel.split(' (')[0]} → {c.toLabel.split(' (')[0]}
-                    </div>
-                    <div className="popular-code">{c.fromCode} → {c.toCode}</div>
-                  </div>
-                  <div className="popular-amount">{c.popularAmount}</div>
-                </button>
-              )
-            })}
-          </div>
         </div>
 
-        {/* SIDEBAR */}
         <aside className="dashboard-side">
-          {/* Transfer Summary */}
           <div className="side-card">
             <h3>Transfer Summary</h3>
             <div className="summary-row">
@@ -208,7 +199,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Rate Trend */}
           <div className="side-card">
             <div className="side-card-head">
               <h3>Rate Trend</h3>
@@ -251,7 +241,6 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
 
-          {/* Safety */}
           <div className="side-card safety">
             <div className="safety-icon">🛡️</div>
             <h3>Stay safe. Always.</h3>
@@ -259,6 +248,39 @@ export default function Dashboard() {
             <a href="#">Learn more</a>
           </div>
         </aside>
+      </div>
+
+      {/* PHONE SHOWCASE — full width, below the grid */}
+      <PhoneShowcase />
+
+      {/* POPULAR CORRIDORS — full width, below the grid */}
+      <div className="popular-section">
+        <h3 className="section-title">Popular Corridors</h3>
+        <div className="popular-grid">
+          {CORRIDORS.map((c) => {
+            const iso = FLAG_ISO[c.fromCode] || 'gb'
+            return (
+              <button
+                key={c.value}
+                className="popular-card"
+                onClick={() => jumpToCorridor(c.value)}
+              >
+                <img
+                  src={`https://flagcdn.com/w40/${iso}.png`}
+                  alt=""
+                  className="popular-flag-img"
+                />
+                <div>
+                  <div className="popular-label">
+                    {c.fromLabel.split(' (')[0]} → {c.toLabel.split(' (')[0]}
+                  </div>
+                  <div className="popular-code">{c.fromCode} → {c.toCode}</div>
+                </div>
+                <div className="popular-amount">{c.popularAmount}</div>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {openMerchant && (

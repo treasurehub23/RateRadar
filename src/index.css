@@ -69,6 +69,7 @@ button, input, select, textarea {
 .main-content {
   flex: 1;
   min-width: 0;
+  max-width: none;
   margin-left: 260px;
   padding: 32px 40px;
   overflow-x: hidden;
