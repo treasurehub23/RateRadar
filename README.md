@@ -1,9 +1,14 @@
-<<<<<<< HEAD
-# React + Vite
+# RateRadar
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+FX and remittance rate comparison engine for the Apify x She Code Africa BuildHer Hackathon.
 
-Currently, two official plugins are available:
+Compares real-world rates across banks, P2P, and fintech apps — shows what you actually receive after fees, plus a reliability score for P2P merchants.
+
+## Development
+
+This project uses React and Vite with HMR.
+
+Two official React plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
@@ -14,11 +19,4 @@ The React Compiler is not enabled on this template because of its impact on dev 
 
 ## Expanding the Oxlint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
-=======
-# RateRadar
-
-FX and remittance rate comparison engine for the Apify x She Code Africa BuildHer Hackathon.
-
-Compares real-world rates across banks, P2P, and fintech apps — shows what you actually receive after fees, plus a reliability score for P2P merchants.
->>>>>>> alte
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules into your project.
