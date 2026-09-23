@@ -31,7 +31,7 @@ class MerchantInput(BaseModel):
 
 Status = Literal["Low", "Medium", "High"]
 class MerchantResult(BaseModel):
-    reliability_status: Status |None
-    reason: str |None 
+    reliability_status: Status 
+    reason: str 
     low_order_count: bool = False
     error: str | None = None
