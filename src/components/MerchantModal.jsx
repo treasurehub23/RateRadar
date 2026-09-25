@@ -1,11 +1,12 @@
 import { X, Info, ExternalLink, Clock, CheckCircle, Users, Star } from 'lucide-react'
 import './MerchantModal.css'
 
-function BinanceLogo() {
+function BybitLogo() {
   return (
-    <svg viewBox="0 0 126.61 126.61" width="22" height="22" fill="#F0B90B">
-      <path d="M38.73 53.2 63.3 28.63 87.9 53.2l14.24-14.24L63.3 0 24.49 38.95zM0 63.3l14.24-14.24L28.48 63.3 14.24 77.54zm38.73 10.11L63.3 97.97l24.6-24.56 14.26 14.21-.02.02L63.3 126.61 24.49 87.66l-.02-.02zM98.13 63.3l14.24-14.24 14.24 14.24-14.24 14.24z"/>
-      <path d="M77.85 63.28h.02L63.3 48.73 52.68 59.34l-1.22 1.22-2.86 2.85-.02.02.02.02L63.3 77.85l14.57-14.55.02-.02z"/>
+    <svg viewBox="0 0 40 40" width="22" height="22">
+      <path d="M6 8 h14 a7 7 0 0 1 0 14 h-14 z" fill="#F7A600" opacity="0.65" />
+      <path d="M6 18 h12 a6 6 0 0 1 0 12 h-12 z" fill="#F7A600" />
+      <rect x="6" y="8" width="4" height="22" fill="#F7A600" />
     </svg>
   )
 }
@@ -44,12 +45,11 @@ function GtbankLogo() {
 }
 
 const PROVIDER_META = {
-  'Binance P2P': { Logo: BinanceLogo, bg: '#0B0E11', kind: 'p2p' },
-  'Bybit P2P':   { Logo: BinanceLogo, bg: '#F7A600', kind: 'p2p' },
-  'Wise':        { Logo: WiseLogo,    bg: '#9FE870', kind: 'transfer' },
-  'Lemfi':       { Logo: LemfiLogo,   bg: '#00C48C', kind: 'transfer' },
-  'Sendwave':    { Logo: SendwaveLogo,bg: '#FFD23F', kind: 'transfer' },
-  'GTBank':      { Logo: GtbankLogo,  bg: '#E31E24', kind: 'bank' },
+  'Bybit P2P': { Logo: BybitLogo,    bg: '#0B0E11', kind: 'p2p' },
+  'Wise':      { Logo: WiseLogo,     bg: '#9FE870', kind: 'transfer' },
+  'Lemfi':     { Logo: LemfiLogo,    bg: '#00C48C', kind: 'transfer' },
+  'Sendwave':  { Logo: SendwaveLogo, bg: '#FFD23F', kind: 'transfer' },
+  'GTBank':    { Logo: GtbankLogo,   bg: '#E31E24', kind: 'bank' },
 }
 
 // Seeded pseudo-random so values stay stable per provider
@@ -96,7 +96,7 @@ export default function MerchantModal({ route, onClose }) {
   if (!route) return null
 
   const reliability = (route.reliability || 'medium').toLowerCase()
-  const meta = PROVIDER_META[route.provider] || { Logo: BinanceLogo, bg: '#7C3AED', kind: 'transfer' }
+  const meta = PROVIDER_META[route.provider] || { Logo: BybitLogo, bg: '#7C3AED', kind: 'transfer' }
   const { Logo, bg, kind } = meta
 
   const stats = getMerchantStats(route.provider, reliability)

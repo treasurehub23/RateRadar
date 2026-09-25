@@ -103,7 +103,7 @@ export default function Dashboard() {
               ))}
               {routes.length === 0 && (
                 <>
-                  <div className="stack-row"><span>Binance P2P</span><strong>1,680,000</strong></div>
+                  <div className="stack-row"><span>Bybit P2P</span><strong>1,680,000</strong></div>
                   <div className="stack-row"><span>Lemfi</span><strong>1,620,000</strong></div>
                   <div className="stack-row"><span>Wise</span><strong>1,580,000</strong></div>
                   <div className="stack-row"><span>GTBank</span><strong>1,520,000</strong></div>
@@ -121,7 +121,7 @@ export default function Dashboard() {
                 <small>/{selected.fromCode.slice(0, 2)}</small>
               </div>
               <div className="stack-sub">
-                {best ? `Best on ${best.provider}` : 'Best on Binance P2P'}
+                {best ? `Best on ${best.provider}` : 'Best on Bybit P2P'}
               </div>
               {savings > 0 && (
                 <div className="stack-badge">
