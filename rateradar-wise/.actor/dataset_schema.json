@@ -1,0 +1,106 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+            "source": {
+                "type": "string"
+            },
+            "source_type": {
+                "type": "string"
+            },
+            "base_currency": {
+                "type": "string"
+            },
+            "target_currency": {
+                "type": "string"
+            },
+            "amount_sent": {
+                "type": "number"
+            },
+            "rate": {
+                "type": "number"
+            },
+            "fee": {
+                "type": "number"
+            },
+            "amount_received": {
+                "type": "number"
+            },
+            "timestamp": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "source",
+            "source_type",
+            "base_currency",
+            "target_currency",
+            "amount_sent",
+            "rate",
+            "fee",
+            "amount_received",
+            "timestamp"
+        ]
+    },
+    "views": {
+        "overview": {
+            "title": "Wise Exchange Rate",
+            "transformation": {
+                "fields": [
+                    "source",
+                    "source_type",
+                    "base_currency",
+                    "target_currency",
+                    "amount_sent",
+                    "rate",
+                    "fee",
+                    "amount_received",
+                    "timestamp"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "source": {
+                        "label": "Source",
+                        "format": "text"
+                    },
+                    "source_type": {
+                        "label": "Source Type",
+                        "format": "text"
+                    },
+                    "base_currency": {
+                        "label": "Base Currency",
+                        "format": "text"
+                    },
+                    "target_currency": {
+                        "label": "Target Currency",
+                        "format": "text"
+                    },
+                    "amount_sent": {
+                        "label": "Amount Sent",
+                        "format": "number"
+                    },
+                    "rate": {
+                        "label": "Rate",
+                        "format": "number"
+                    },
+                    "fee": {
+                        "label": "Fee",
+                        "format": "number"
+                    },
+                    "amount_received": {
+                        "label": "Amount Received",
+                        "format": "number"
+                    },
+                    "timestamp": {
+                        "label": "Timestamp",
+                        "format": "text"
+                    }
+                }
+            }
+        }
+    }
+}

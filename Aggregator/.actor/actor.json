@@ -1,0 +1,11 @@
+{
+  "actorSpecification": 1,
+  "name": "rateradar-aggregator",
+  "title": "RateRadar Aggregator",
+  "description": "Aggregates normalized exchange-rate data",
+  "version": "0.0",
+  "build": {
+    "buildTag": "latest"
+  },
+  "input": "./input_schema.json"
+}

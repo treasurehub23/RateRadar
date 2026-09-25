@@ -1,3 +1,7 @@
+storage
+node_modules
+.venv
+.env
 # Logs
 logs
 *.log
