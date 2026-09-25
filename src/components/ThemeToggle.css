@@ -1,0 +1,14 @@
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--gray-700);
+  transition: background 0.15s, color 0.15s;
+}
+.theme-toggle:hover {
+  background: var(--purple-50);
+  color: var(--purple-600);
+}
