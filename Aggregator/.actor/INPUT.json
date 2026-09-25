@@ -1,0 +1,16 @@
+{
+  "rates": [
+    {
+      "source": "wise",
+      "source_type": "remittance",
+      "base_currency": "USD",
+      "target_currency": "NGN",
+      "amount_sent": 1000,
+      "rate": 1373.63,
+      "fee": 12.18,
+      "amount_received": 1356899.19,
+      "timestamp": "2026-09-24T19:08:56Z"
+    }
+  ],
+  "kvStoreId": "X8leytqXZFyBAraJE"
+}

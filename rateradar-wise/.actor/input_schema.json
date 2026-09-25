@@ -1,0 +1,39 @@
+{
+    "$schema": "https://apify.com/schemas/v1/input.ide.json",
+    "title": "RateRadar Wise Exchange Rate Input",
+    "description": "Fetch an exchange rate and transfer quote from Wise.",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "amount": {
+            "title": "Amount to send",
+            "type": "number",
+            "description": "The amount of the source currency to convert.",
+            "editor": "number",
+            "minimum": 0.01,
+            "default": 100
+        },
+        "sourceCurrency": {
+            "title": "Source currency",
+            "type": "string",
+            "description": "The 3-letter currency code you are sending, for example USD.",
+            "editor": "textfield",
+            "pattern": "^[A-Z]{3}$",
+            "default": "USD"
+        },
+        "targetCurrency": {
+            "title": "Target currency",
+            "type": "string",
+            "description": "The 3-letter currency code you are converting to, for example NGN.",
+            "editor": "textfield",
+            "pattern": "^[A-Z]{3}$",
+            "default": "NGN"
+        }
+    },
+    "required": [
+        "amount",
+        "sourceCurrency",
+        "targetCurrency"
+    ],
+    "additionalProperties": false
+}

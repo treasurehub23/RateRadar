@@ -1,0 +1,29 @@
+{
+  "$schema": "https://apify.com/schemas/v1/input.schema.json",
+  "title": "RateRadar Aggregator Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "rates": {
+      "title": "Normalized rate records",
+      "type": "array",
+      "description": "Normalized rate records produced by RateRadar scraper Actors.",
+      "editor": "json",
+      "default": []
+    },
+    "kvStoreId": {
+  "title": "Persistent KV Store ID",
+  "type": "string",
+  "description": "Apify Key-Value Store used for RateRadar persistent state.",
+  "editor": "textfield",
+  "default": "X8leytqXZFyBAraJE"  
+}
+  },
+  "required": [
+    "rates",
+  
+    "kvStoreId"
+  ],
+  "additionalProperties": false
+}
+
