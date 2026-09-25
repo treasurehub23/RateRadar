@@ -6,15 +6,42 @@ export default function CorridorSelector({ corridor, setCorridor, amount, setAmo
   const fromISO = FLAG_ISO[selected.fromCode] || 'un'
   const toISO = FLAG_ISO[selected.toCode] || 'un'
 
+  // Unique "from" options (one per source country/currency)
+  const fromOptions = CORRIDORS.filter(
+    (c, i, arr) => arr.findIndex((x) => x.fromCode === c.fromCode) === i
+  )
+
+  // Only "to" options that actually exist for the selected "from"
+  const toOptions = CORRIDORS.filter((c) => c.fromCode === selected.fromCode)
+
+  const handleFromChange = (fromCode) => {
+    // Pick the first corridor that matches the new "from"
+    const next = CORRIDORS.find((c) => c.fromCode === fromCode)
+    if (next) setCorridor(next.value)
+  }
+
+  const handleToChange = (toCode) => {
+    // Find corridor matching current "from" + chosen "to"
+    const next = CORRIDORS.find(
+      (c) => c.fromCode === selected.fromCode && c.toCode === toCode
+    )
+    if (next) setCorridor(next.value)
+  }
+
   return (
     <div className="selector">
       <div className="selector-field">
         <label>From</label>
         <div className="select-wrap">
           <img src={`https://flagcdn.com/w20/${fromISO}.png`} alt="" className="select-flag" />
-          <select value={corridor} onChange={(e) => setCorridor(e.target.value)}>
-            {CORRIDORS.map((c) => (
-              <option key={c.value} value={c.value}>{c.fromLabel}</option>
+          <select
+            value={selected.fromCode}
+            onChange={(e) => handleFromChange(e.target.value)}
+          >
+            {fromOptions.map((c) => (
+              <option key={c.fromCode} value={c.fromCode}>
+                {c.fromLabel}
+              </option>
             ))}
           </select>
         </div>
@@ -24,8 +51,16 @@ export default function CorridorSelector({ corridor, setCorridor, amount, setAmo
         <label>To</label>
         <div className="select-wrap">
           <img src={`https://flagcdn.com/w20/${toISO}.png`} alt="" className="select-flag" />
-          <select disabled value={corridor}>
-            <option>{selected.toLabel}</option>
+          <select
+            value={selected.toCode}
+            onChange={(e) => handleToChange(e.target.value)}
+            disabled={toOptions.length <= 1}
+          >
+            {toOptions.map((c) => (
+              <option key={c.toCode} value={c.toCode}>
+                {c.toLabel}
+              </option>
+            ))}
           </select>
         </div>
       </div>
