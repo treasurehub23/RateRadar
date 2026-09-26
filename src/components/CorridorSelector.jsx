@@ -1,46 +1,33 @@
-import { CORRIDORS, FLAG_ISO } from '../constants'
+import { COUNTRIES, getCountryByCurrency } from '../constants'
 import './CorridorSelector.css'
 
-export default function CorridorSelector({ corridor, setCorridor, amount, setAmount, onCompare, loading }) {
-  const selected = CORRIDORS.find((c) => c.value === corridor) || CORRIDORS[0]
-  const fromISO = FLAG_ISO[selected.fromCode] || 'un'
-  const toISO = FLAG_ISO[selected.toCode] || 'un'
-
-  // Unique "from" options (one per source country/currency)
-  const fromOptions = CORRIDORS.filter(
-    (c, i, arr) => arr.findIndex((x) => x.fromCode === c.fromCode) === i
-  )
-
-  // Only "to" options that actually exist for the selected "from"
-  const toOptions = CORRIDORS.filter((c) => c.fromCode === selected.fromCode)
-
-  const handleFromChange = (fromCode) => {
-    // Pick the first corridor that matches the new "from"
-    const next = CORRIDORS.find((c) => c.fromCode === fromCode)
-    if (next) setCorridor(next.value)
-  }
-
-  const handleToChange = (toCode) => {
-    // Find corridor matching current "from" + chosen "to"
-    const next = CORRIDORS.find(
-      (c) => c.fromCode === selected.fromCode && c.toCode === toCode
-    )
-    if (next) setCorridor(next.value)
-  }
+export default function CorridorSelector({
+  fromCode,
+  setFromCode,
+  toCode,
+  setToCode,
+  amount,
+  setAmount,
+  onCompare,
+  loading,
+}) {
+  const fromCountry = getCountryByCurrency(fromCode)
+  const toCountry = getCountryByCurrency(toCode)
 
   return (
     <div className="selector">
       <div className="selector-field">
         <label>From</label>
         <div className="select-wrap">
-          <img src={`https://flagcdn.com/w20/${fromISO}.png`} alt="" className="select-flag" />
-          <select
-            value={selected.fromCode}
-            onChange={(e) => handleFromChange(e.target.value)}
-          >
-            {fromOptions.map((c) => (
-              <option key={c.fromCode} value={c.fromCode}>
-                {c.fromLabel}
+          <img
+            src={`https://flagcdn.com/w20/${fromCountry.iso}.png`}
+            alt=""
+            className="select-flag"
+          />
+          <select value={fromCode} onChange={(e) => setFromCode(e.target.value)}>
+            {COUNTRIES.map((c) => (
+              <option key={c.currency} value={c.currency}>
+                {c.name} ({c.currency})
               </option>
             ))}
           </select>
@@ -50,15 +37,15 @@ export default function CorridorSelector({ corridor, setCorridor, amount, setAmo
       <div className="selector-field">
         <label>To</label>
         <div className="select-wrap">
-          <img src={`https://flagcdn.com/w20/${toISO}.png`} alt="" className="select-flag" />
-          <select
-            value={selected.toCode}
-            onChange={(e) => handleToChange(e.target.value)}
-            disabled={toOptions.length <= 1}
-          >
-            {toOptions.map((c) => (
-              <option key={c.toCode} value={c.toCode}>
-                {c.toLabel}
+          <img
+            src={`https://flagcdn.com/w20/${toCountry.iso}.png`}
+            alt=""
+            className="select-flag"
+          />
+          <select value={toCode} onChange={(e) => setToCode(e.target.value)}>
+            {COUNTRIES.map((c) => (
+              <option key={c.currency} value={c.currency}>
+                {c.name} ({c.currency})
               </option>
             ))}
           </select>
@@ -68,12 +55,13 @@ export default function CorridorSelector({ corridor, setCorridor, amount, setAmo
       <div className="selector-field amount">
         <label>Amount</label>
         <div className="amount-input">
-          <span>{selected.currency}</span>
+          <span>{fromCountry.symbol}</span>
           <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-          />
+  type="number"
+  value={amount === 0 ? '' : amount}
+  onChange={(e) => setAmount(Number(e.target.value) || 0)}
+  placeholder="Enter amount"
+/>
         </div>
       </div>
 

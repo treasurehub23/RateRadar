@@ -1,7 +1,6 @@
 import MerchantBadge from './MerchantBadge'
 import './ComparisonTable.css'
 
-// Inline SVG logos — 100% reliable, no external requests
 function BybitLogo() {
   return (
     <svg viewBox="0 0 40 40" width="22" height="22">
@@ -70,7 +69,14 @@ function ProviderLogo({ provider }) {
   )
 }
 
-export default function ComparisonTable({ routes, loading, rateUnit = '1 GBP', toCode = 'NGN', onView }) {
+export default function ComparisonTable({
+  routes,
+  loading,
+  fromSymbol = '£',
+  toSymbol = '₦',
+  toCode = 'NGN',
+  onView,
+}) {
   if (loading) {
     return (
       <div className="table-skeleton">
@@ -92,7 +98,7 @@ export default function ComparisonTable({ routes, loading, rateUnit = '1 GBP', t
       <div className="table-header">
         <div>Provider</div>
         <div>You'll Receive</div>
-        <div>Exchange Rate ({rateUnit})</div>
+        <div>Exchange Rate</div>
         <div>Fees</div>
         <div>Total Cost</div>
         <div>Reliability</div>
@@ -112,11 +118,26 @@ export default function ComparisonTable({ routes, loading, rateUnit = '1 GBP', t
             </div>
           </div>
 
-          <div className="cell-receive">{r.received.toLocaleString()} {toCode}</div>
-          <div className="cell-rate">₦{r.rate.toLocaleString()} / £1</div>
-          <div className="cell-fees">{r.feePercent}% + ₦{r.feeFlat}</div>
-          <div className="cell-cost">₦{r.totalCost.toLocaleString()}</div>
-          <div className="cell-reliability"><MerchantBadge reliability={r.reliability} /></div>
+          <div className="cell-receive">
+            {toSymbol}{r.received.toLocaleString()}
+          </div>
+
+          <div className="cell-rate">
+            {toSymbol}{r.rate.toLocaleString()} / {fromSymbol}1
+          </div>
+
+          <div className="cell-fees">
+            {r.feePercent}% + {toSymbol}{r.feeFlat.toLocaleString()}
+          </div>
+
+          <div className="cell-cost">
+            {toSymbol}{r.totalCost.toLocaleString()}
+          </div>
+
+          <div className="cell-reliability">
+            <MerchantBadge reliability={r.reliability} />
+          </div>
+
           <div className="cell-action">
             <button className="btn-view" onClick={() => onView && onView(r)}>View</button>
           </div>

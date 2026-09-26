@@ -92,14 +92,14 @@ function getMerchantStats(provider, reliability) {
   }
 }
 
-export default function MerchantModal({ route, onClose }) {
+export default function MerchantModal({ route, onClose, toSymbol = '₦' }) {
   if (!route) return null
 
   const reliability = (route.reliability || 'medium').toLowerCase()
   const meta = PROVIDER_META[route.provider] || { Logo: BybitLogo, bg: '#7C3AED', kind: 'transfer' }
   const { Logo, bg, kind } = meta
 
-  const stats = getMerchantStats(route.provider, reliability)
+const stats = getMerchantStats(route.provider + route.received, reliability)
 
   const colorMap = {
     high:   { bg: '#D1FAE5', color: '#047857', pct: stats.completion },
@@ -131,8 +131,9 @@ export default function MerchantModal({ route, onClose }) {
         <div className="modal-body">
           <div>
             <div className="modal-receive-label">You'll Receive</div>
-            <div className="modal-receive-amount">{route.received.toLocaleString()} NGN</div>
-            <div className="modal-receive-note">after fees</div>
+            <div className="modal-receive-amount">
+  {toSymbol}{route.received.toLocaleString()}
+</div>
           </div>
           <div className="modal-side">
             {route.bestRate && <span className="best-badge">Best Rate</span>}

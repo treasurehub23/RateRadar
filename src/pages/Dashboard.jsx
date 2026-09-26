@@ -5,21 +5,23 @@ import CorridorSelector from '../components/CorridorSelector'
 import MerchantModal from '../components/MerchantModal'
 import PhoneShowcase from '../components/PhoneShowcase'
 import { getComparison, MOCK_TREND } from '../api'
-import { CORRIDORS, getCorridor } from '../constants'
+import { COUNTRIES, getCountryByCurrency, CORRIDORS } from '../constants'
 import './Dashboard.css'
 
-const FLAG_ISO = { GBP: 'gb', USD: 'us', CAD: 'ca', EUR: 'eu', KES: 'ke', NGN: 'ng', GHS: 'gh' }
-
 export default function Dashboard() {
-  const [corridor, setCorridor] = useState('UK-NG')
-  const [amount, setAmount] = useState(1000)
+  const [fromCode, setFromCode] = useState('GBP')
+  const [toCode, setToCode] = useState('NGN')
+  const [amount, setAmount] = useState(0)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [openMerchant, setOpenMerchant] = useState(null)
 
-  const selected = getCorridor(corridor)
-  const fromISO = FLAG_ISO[selected.fromCode] || 'gb'
-  const toISO = FLAG_ISO[selected.toCode] || 'ng'
+  const corridor = `${fromCode}-${toCode}`
+  const fromCountry = getCountryByCurrency(fromCode)
+  const toCountry = getCountryByCurrency(toCode)
+
+  const fromSymbol = fromCountry.symbol
+  const toSymbol = data?.symbol || toCountry.symbol
 
   const handleCompare = async () => {
     setLoading(true)
@@ -31,16 +33,18 @@ export default function Dashboard() {
   useEffect(() => {
     handleCompare()
     // eslint-disable-next-line
-  }, [corridor, amount])
-
-  const jumpToCorridor = (value) => {
-    setCorridor(value)
-  }
+  }, [fromCode, toCode, amount])
 
   const best = data?.routes?.[0]
   const worst = data?.routes?.[data.routes.length - 1]
   const savings = best && worst ? best.received - worst.received : 0
   const routes = data?.routes || []
+
+  const jumpToCorridor = (value) => {
+    const [f, t] = value.split('-')
+    setFromCode(f)
+    setToCode(t)
+  }
 
   return (
     <div>
@@ -57,8 +61,10 @@ export default function Dashboard() {
             Get the best deal, with confidence.
           </p>
           <CorridorSelector
-            corridor={corridor}
-            setCorridor={setCorridor}
+            fromCode={fromCode}
+            setFromCode={setFromCode}
+            toCode={toCode}
+            setToCode={setToCode}
             amount={amount}
             setAmount={setAmount}
             onCompare={handleCompare}
@@ -80,13 +86,13 @@ export default function Dashboard() {
           </svg>
 
           <div className="flag-chip flag-chip-from">
-            <img src={`https://flagcdn.com/w40/${fromISO}.png`} alt="" className="flag-img" />
-            <span className="flag-code">{selected.fromCode.slice(0, 2).toUpperCase()}</span>
+            <img src={`https://flagcdn.com/w40/${fromCountry.iso}.png`} alt="" className="flag-img" />
+            <span className="flag-code">{fromCode}</span>
           </div>
 
           <div className="flag-chip flag-chip-to">
-            <img src={`https://flagcdn.com/w40/${toISO}.png`} alt="" className="flag-img" />
-            <span className="flag-code">{selected.toCode.slice(0, 2).toUpperCase()}</span>
+            <img src={`https://flagcdn.com/w40/${toCountry.iso}.png`} alt="" className="flag-img" />
+            <span className="flag-code">{toCode}</span>
           </div>
 
           <div className="hero-stack">
@@ -98,15 +104,13 @@ export default function Dashboard() {
               {routes.slice(0, 4).map((r) => (
                 <div key={r.provider} className="stack-row">
                   <span>{r.provider}</span>
-                  <strong>{r.received.toLocaleString()}</strong>
+                  <strong>{toSymbol}{r.received.toLocaleString()}</strong>
                 </div>
               ))}
               {routes.length === 0 && (
                 <>
-                  <div className="stack-row"><span>Bybit P2P</span><strong>1,680,000</strong></div>
-                  <div className="stack-row"><span>Lemfi</span><strong>1,620,000</strong></div>
-                  <div className="stack-row"><span>Wise</span><strong>1,580,000</strong></div>
-                  <div className="stack-row"><span>GTBank</span><strong>1,520,000</strong></div>
+                  <div className="stack-row"><span>Bybit P2P</span><strong>—</strong></div>
+                  <div className="stack-row"><span>Wise</span><strong>—</strong></div>
                 </>
               )}
             </div>
@@ -117,15 +121,15 @@ export default function Dashboard() {
                 <span>Live rate</span>
               </div>
               <div className="stack-big">
-                {best ? `₦${best.rate.toLocaleString()}` : '₦1,680'}
-                <small>/{selected.fromCode.slice(0, 2)}</small>
+                {best ? `${toSymbol}${best.rate.toLocaleString()}` : `${toSymbol}—`}
+                <small>/{fromCode}</small>
               </div>
               <div className="stack-sub">
-                {best ? `Best on ${best.provider}` : 'Best on Bybit P2P'}
+                {best ? `Best on ${best.provider}` : 'Waiting for rates...'}
               </div>
               {savings > 0 && (
                 <div className="stack-badge">
-                  Save {savings.toLocaleString()} {selected.toCode}
+                  Save {toSymbol}{savings.toLocaleString()}
                 </div>
               )}
             </div>
@@ -133,20 +137,20 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* MAIN GRID — Comparison Results + Sidebar */}
+      {/* MAIN GRID */}
       <div className="dashboard-grid">
         <div className="dashboard-main">
           <h2 className="section-title">Comparison Results</h2>
           <p className="section-sub">
-            Showing the best rates for {selected.currency}{amount.toLocaleString()} from{' '}
-            {selected.fromLabel.split(' (')[0]} to {selected.toLabel.split(' (')[0]}
+            Showing the best rates for {fromSymbol}{amount.toLocaleString()} from {fromCountry.name} to {toCountry.name}
           </p>
 
           <ComparisonTable
             routes={routes}
             loading={loading}
-            rateUnit={`1 ${selected.fromCode}`}
-            toCode={selected.toCode}
+            fromSymbol={fromSymbol}
+            toSymbol={toSymbol}
+            toCode={toCode}
             onView={(route) => setOpenMerchant(route)}
           />
 
@@ -155,11 +159,11 @@ export default function Dashboard() {
               <span className="savings-icon">💡</span>
               <div>
                 <strong>
-                  You could get {savings.toLocaleString()} {selected.toCode} more with {best.provider}!
+                  You could get {toSymbol}{savings.toLocaleString()} more with {best.provider}!
                 </strong>
                 <p>
-                  Compared to the worst option, you'll receive {best.received.toLocaleString()}{' '}
-                  instead of {worst.received.toLocaleString()} {selected.toCode}.
+                  Compared to the worst option, you'll receive {toSymbol}{best.received.toLocaleString()}{' '}
+                  instead of {toSymbol}{worst.received.toLocaleString()}.
                 </p>
               </div>
               <button className="btn-outline">See Details</button>
@@ -173,27 +177,27 @@ export default function Dashboard() {
             <div className="summary-row">
               <span>From</span>
               <strong>
-                <img src={`https://flagcdn.com/w20/${fromISO}.png`} alt="" className="inline-flag" />
-                {selected.fromLabel}
+                <img src={`https://flagcdn.com/w20/${fromCountry.iso}.png`} alt="" className="inline-flag" />
+                {fromCountry.name}
               </strong>
             </div>
             <div className="summary-row">
               <span>To</span>
               <strong>
-                <img src={`https://flagcdn.com/w20/${toISO}.png`} alt="" className="inline-flag" />
-                {selected.toLabel}
+                <img src={`https://flagcdn.com/w20/${toCountry.iso}.png`} alt="" className="inline-flag" />
+                {toCountry.name}
               </strong>
             </div>
             <div className="summary-row">
               <span>Amount</span>
-              <strong>{selected.currency}{amount.toLocaleString()}</strong>
+              <strong>{fromSymbol}{amount.toLocaleString()}</strong>
             </div>
             {best && (
               <div className="best-option-box">
                 <div className="bo-label">Best Option</div>
                 <div className="bo-provider">{best.provider}</div>
                 <div className="bo-amount">
-                  You'll receive {best.received.toLocaleString()} {selected.toCode}
+                  You'll receive {toSymbol}{best.received.toLocaleString()}
                 </div>
               </div>
             )}
@@ -213,30 +217,10 @@ export default function Dashboard() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F0F5" vertical={false} />
-                <XAxis
-                  dataKey="day"
-                  tick={{ fontSize: 11, fill: '#9CA3AF' }}
-                  stroke="#E5E7EB"
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: '#9CA3AF' }}
-                  stroke="#E5E7EB"
-                  tickLine={false}
-                  axisLine={false}
-                  domain={['dataMin - 50', 'dataMax + 50']}
-                />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#9CA3AF' }} stroke="#E5E7EB" tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} stroke="#E5E7EB" tickLine={false} axisLine={false} domain={['dataMin - 50', 'dataMax + 50']} />
                 <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #EDE9FE', fontSize: 12 }} />
-                <Area
-                  type="monotone"
-                  dataKey="rate"
-                  stroke="#7C3AED"
-                  strokeWidth={2.5}
-                  fill="url(#rateGrad)"
-                  dot={{ r: 4, fill: '#7C3AED', stroke: '#fff', strokeWidth: 2 }}
-                  activeDot={{ r: 6 }}
-                />
+                <Area type="monotone" dataKey="rate" stroke="#7C3AED" strokeWidth={2.5} fill="url(#rateGrad)" dot={{ r: 4, fill: '#7C3AED', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -250,30 +234,18 @@ export default function Dashboard() {
         </aside>
       </div>
 
-      {/* PHONE SHOWCASE — full width, below the grid */}
       <PhoneShowcase />
 
-      {/* POPULAR CORRIDORS — full width, below the grid */}
       <div className="popular-section">
         <h3 className="section-title">Popular Corridors</h3>
         <div className="popular-grid">
           {CORRIDORS.map((c) => {
-            const iso = FLAG_ISO[c.fromCode] || 'gb'
+            const fromC = getCountryByCurrency(c.fromCode)
             return (
-              <button
-                key={c.value}
-                className="popular-card"
-                onClick={() => jumpToCorridor(c.value)}
-              >
-                <img
-                  src={`https://flagcdn.com/w40/${iso}.png`}
-                  alt=""
-                  className="popular-flag-img"
-                />
+              <button key={c.value} className="popular-card" onClick={() => jumpToCorridor(c.value)}>
+                <img src={`https://flagcdn.com/w40/${fromC.iso}.png`} alt="" className="popular-flag-img" />
                 <div>
-                  <div className="popular-label">
-                    {c.fromLabel.split(' (')[0]} → {c.toLabel.split(' (')[0]}
-                  </div>
+                  <div className="popular-label">{c.fromLabel.split(' (')[0]} → {c.toLabel.split(' (')[0]}</div>
                   <div className="popular-code">{c.fromCode} → {c.toCode}</div>
                 </div>
                 <div className="popular-amount">{c.popularAmount}</div>
@@ -284,7 +256,11 @@ export default function Dashboard() {
       </div>
 
       {openMerchant && (
-        <MerchantModal route={openMerchant} onClose={() => setOpenMerchant(null)} />
+        <MerchantModal
+          route={openMerchant}
+          onClose={() => setOpenMerchant(null)}
+          toSymbol={toSymbol}
+        />
       )}
     </div>
   )

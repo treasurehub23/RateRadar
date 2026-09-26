@@ -1,38 +1,39 @@
 ﻿import axios from 'axios'
-import { CORRIDORS } from '../constants'
+import { CORRIDORS, getCountryByCurrency } from '../constants'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
-// ---------- BASE RATES PER CORRIDOR (at 1000 sender units) ----------
-// Provider lists reflect which companies actually operate on each corridor
-const BASE_RATES = {
-  'UK-NG': { currency: 'GBP', toCode: 'NGN', symbol: '₦', routes: [
-    { provider: 'Bybit P2P', method: 'P2P (Merchant)', rate: 1740, feePercent: -0.5, feeFlat: 500,  reliability: 'medium', bestRate: true },
-    { provider: 'Lemfi',     method: 'Transfer',       rate: 1680, feePercent: -1.0, feeFlat: 1000, reliability: 'high' },
-    { provider: 'Sendwave',  method: 'Transfer',       rate: 1650, feePercent: -1.5, feeFlat: 2000, reliability: 'medium' },
-    { provider: 'Wise',      method: 'Transfer',       rate: 1630, feePercent: -1.2, feeFlat: 2500, reliability: 'high' },
-    { provider: 'GTBank',    method: 'Bank Transfer',  rate: 1540, feePercent: -2.5, feeFlat: 3000, reliability: 'high' },
-  ]},
+// ---------- USD-based reference rates (1 USD = X) ----------
+// Used for cross-conversion between ANY pair of currencies.
+const USD_RATES = {
+  USD: 1, GBP: 0.79, EUR: 0.92, CAD: 1.36, AUD: 1.52, NZD: 1.64,
+  CHF: 0.88, SEK: 10.5, NOK: 10.7, DKK: 6.85,
+  JPY: 150, CNY: 7.2, INR: 83, SGD: 1.34, HKD: 7.82, KRW: 1340,
+  MYR: 4.7, THB: 36, PHP: 57, IDR: 15800, PKR: 278, BDT: 118,
+  AED: 3.67, SAR: 3.75, QAR: 3.64, KWD: 0.31, BHD: 0.38, OMR: 0.385,
+  BRL: 5.5, MXN: 17.5, ARS: 900,
+  NGN: 1580, GHS: 15.3, KES: 128.5, ZAR: 18.4,
+  UGX: 3800, TZS: 2650, RWF: 1300, ETB: 57, EGP: 48, MAD: 10,
+  ZMW: 27, ZWL: 13, BWP: 13.6, NAD: 18.4, MWK: 1740, MZN: 63, AOA: 830,
+  XAF: 605, XOF: 605,
+}
 
-  'USA-GH': { currency: 'USD', toCode: 'GHS', symbol: 'GH₵', routes: [
-    { provider: 'Bybit P2P', method: 'P2P (Merchant)', rate: 16.2, feePercent: -0.4, feeFlat: 5,  reliability: 'medium', bestRate: true },
-    { provider: 'Lemfi',     method: 'Transfer',       rate: 15.6, feePercent: -0.9, feeFlat: 8,  reliability: 'high' },
-    { provider: 'Sendwave',  method: 'Transfer',       rate: 15.4, feePercent: -1.4, feeFlat: 12, reliability: 'medium' },
-    { provider: 'Wise',      method: 'Transfer',       rate: 15.3, feePercent: -1.1, feeFlat: 10, reliability: 'high' },
-  ]},
+// ---------- PROVIDERS that appear on every corridor ----------
+const PROVIDERS = [
+  { provider: 'Bybit P2P', method: 'P2P (Merchant)', mult: 1.00, feePercent: -0.5, feeFlatBase: 500, reliability: 'medium' },
+  { provider: 'Lemfi',     method: 'Transfer',       mult: 0.97, feePercent: -1.0, feeFlatBase: 1000, reliability: 'high' },
+  { provider: 'Sendwave',  method: 'Transfer',       mult: 0.95, feePercent: -1.5, feeFlatBase: 2000, reliability: 'medium' },
+  { provider: 'Wise',      method: 'Transfer',       mult: 0.94, feePercent: -1.2, feeFlatBase: 2500, reliability: 'high' },
+  { provider: 'GTBank',    method: 'Bank Transfer',  mult: 0.88, feePercent: -2.5, feeFlatBase: 3000, reliability: 'high' },
+]
 
-  'CAD-KE': { currency: 'CAD', toCode: 'KES', symbol: 'KSh ', routes: [
-    { provider: 'Bybit P2P', method: 'P2P (Merchant)', rate: 98.0, feePercent: -0.5, feeFlat: 30, reliability: 'medium', bestRate: true },
-    { provider: 'Wise',      method: 'Transfer',       rate: 94.5, feePercent: -1.2, feeFlat: 60, reliability: 'high' },
-    { provider: 'Sendwave',  method: 'Transfer',       rate: 93.0, feePercent: -1.5, feeFlat: 80, reliability: 'medium' },
-  ]},
-
-  'EU-NG': { currency: 'EUR', toCode: 'NGN', symbol: '₦', routes: [
-    { provider: 'Bybit P2P', method: 'P2P (Merchant)', rate: 1760, feePercent: -0.5, feeFlat: 500,  reliability: 'medium', bestRate: true },
-    { provider: 'Lemfi',     method: 'Transfer',       rate: 1700, feePercent: -1.0, feeFlat: 1000, reliability: 'high' },
-    { provider: 'Wise',      method: 'Transfer',       rate: 1650, feePercent: -1.2, feeFlat: 2500, reliability: 'high' },
-    { provider: 'GTBank',    method: 'Bank Transfer',  rate: 1580, feePercent: -2.5, feeFlat: 3000, reliability: 'high' },
-  ]},
+// ---------- Hardcoded polished rates for popular corridors ----------
+const HARDCODED = {
+  'GBP-NGN': 1740, 'USD-NGN': 1580, 'EUR-NGN': 1760,
+  'CAD-NGN': 1720, 'AUD-NGN': 1030, 'AED-NGN': 452,
+  'USD-GHS': 16.2, 'GBP-GHS': 18.2, 'EUR-GHS': 15.6, 'CAD-GHS': 11.2,
+  'USD-KES': 128.5, 'GBP-KES': 165, 'EUR-KES': 142, 'CAD-KES': 98, 'AUD-KES': 85.4, 'AED-KES': 35.8,
+  'USD-ZAR': 18.4, 'GBP-ZAR': 23.6, 'EUR-ZAR': 20.0,
 }
 
 const MERCHANT_META = {
@@ -44,55 +45,72 @@ const MERCHANT_META = {
   advice: 'This merchant has a medium reliability score. Consider Wise for a safer option, though the rate is slightly lower.',
 }
 
-// ---------- BUILD A RESPONSE FOR ANY CORRIDOR + AMOUNT ----------
+function getBaseRate(fromCode, toCode) {
+  const key = `${fromCode}-${toCode}`
+  if (HARDCODED[key]) return HARDCODED[key]
+  const fromRate = USD_RATES[fromCode] || 1
+  const toRate = USD_RATES[toCode] || 1
+  return toRate / fromRate
+}
+
 function buildMockComparison(corridor, amount) {
-  const base = BASE_RATES[corridor] || BASE_RATES['UK-NG']
+  const [fromCode, toCode] = corridor.split('-')
+
+  const fromCountry = getCountryByCurrency(fromCode)
+  const toCountry = getCountryByCurrency(toCode)
+
+  const baseRate = getBaseRate(fromCode, toCode)
   const scale = amount / 1000
 
-  const routes = base.routes.map((r) => {
-    const received = Math.round(r.rate * amount)
-    const feeFlat = Math.round(r.feeFlat * scale)
+  const routes = PROVIDERS.map((p) => {
+    const rate = +(baseRate * p.mult).toFixed(4)
+    const received = Math.round(rate * amount)
+    const feeFlat = Math.round(p.feeFlatBase * scale)
     const totalCost = Math.round(received + Math.abs(feeFlat))
     return {
-      provider: r.provider,
-      method: r.method,
-      rate: r.rate,
-      feePercent: r.feePercent,
+      provider: p.provider,
+      method: p.method,
+      rate,
+      feePercent: p.feePercent,
       feeFlat,
-      feeCurrency: base.toCode,
+      feeCurrency: toCode,
       received,
       totalCost,
-      reliability: r.reliability,
-      bestRate: r.bestRate || false,
-      ...(r.provider === 'Bybit P2P' ? { merchant: MERCHANT_META } : {}),
+      reliability: p.reliability,
+      bestRate: false,
+      ...(p.provider === 'Bybit P2P' ? { merchant: MERCHANT_META } : {}),
     }
   })
+
+  routes.sort((a, b) => b.received - a.received)
+  if (routes[0]) routes[0].bestRate = true
 
   return {
     corridor,
     amount,
-    currency: base.currency,
-    toCode: base.toCode,
-    symbol: base.symbol,
+    currency: fromCode,
+    toCode,
+    symbol: toCountry.symbol,
+    fromName: fromCountry.name,
+    toName: toCountry.name,
     updatedAt: new Date().toISOString(),
     routes,
   }
 }
 
-// ---------- MOCK CONSTANTS (fallback data) ----------
-export const MOCK_COMPARISON = buildMockComparison('UK-NG', 1000)
+export const MOCK_COMPARISON = buildMockComparison('GBP-NGN', 1000)
 
 export const MOCK_ALERTS = [
-  { id: 1, type: 'rate-spread', severity: 'high', title: 'High Rate Spread Detected', body: 'The difference between the best and worst rate for UK → NG is 11.5% (usually < 5%).', time: 'Today, 10:24 AM' },
-  { id: 2, type: 'reliability', severity: 'medium', title: 'Bybit P2P Merchant Reliability Dropped', body: "The top merchant's reliability score fell from 92% to 68%.", time: 'Yesterday, 4:12 PM' },
-  { id: 3, type: 'fee-change', severity: 'info', title: 'New Fee Structure Detected', body: 'Lemfi increased transfer fees from 1.0% to 1.5%.', time: 'Aug 28, 2025' },
-  { id: 4, type: 'rate-spread', severity: 'success', title: 'Better Rate Available', body: 'Wise is now 2.3% better than the bank for UK → NG.', time: 'Aug 27, 2025' },
-  { id: 5, type: 'rate-spread', severity: 'high', title: 'Parallel Market Spread Widened', body: 'Official vs parallel rate gap for USD → NGN crossed 18% today.', time: 'Aug 27, 2025' },
-  { id: 6, type: 'reliability', severity: 'medium', title: 'New High-Reliability Merchant Detected', body: 'A Bybit P2P merchant with 98% completion rate is now offering ₦1,720/$.', time: 'Aug 26, 2025' },
-  { id: 7, type: 'fee-change', severity: 'info', title: 'Sendwave Fee Update', body: 'Sendwave reduced its flat fee from $2.50 to $1.99 for UK → NG transfers.', time: 'Aug 26, 2025' },
-  { id: 8, type: 'reliability', severity: 'high', title: 'Suspicious Merchant Activity', body: 'A merchant on Bybit P2P with 12 trades and 41% completion rate is offering above-market rates. Approach with caution.', time: 'Aug 25, 2025' },
-  { id: 9, type: 'rate-spread', severity: 'success', title: 'Stable Week for GBP → NGN', body: 'Rate has moved less than 1.2% over the last 7 days. Good time to send.', time: 'Aug 25, 2025' },
-  { id: 10, type: 'fee-change', severity: 'medium', title: 'Hidden FX Markup Detected', body: 'Two providers are inflating rates by 0.8%–1.4% instead of showing fees upfront.', time: 'Aug 24, 2025' },
+  { id: 1,  type: 'rate-spread', severity: 'high',    title: 'High Rate Spread Detected',              body: 'The difference between the best and worst rate is above 10% on several corridors.',          time: 'Today, 10:24 AM' },
+  { id: 2,  type: 'reliability', severity: 'medium',  title: 'Bybit P2P Merchant Reliability Dropped',  body: "The top merchant's reliability score fell from 92% to 68%.",                                  time: 'Yesterday, 4:12 PM' },
+  { id: 3,  type: 'fee-change',  severity: 'info',    title: 'New Fee Structure Detected',              body: 'Lemfi increased transfer fees from 1.0% to 1.5%.',                                            time: 'Sep 23, 2026' },
+  { id: 4,  type: 'rate-spread', severity: 'success', title: 'Better Rate Available',                   body: 'Wise is now 2.3% better than the bank for UK → NG.',                                          time: 'Sep 22, 2026' },
+  { id: 5,  type: 'rate-spread', severity: 'high',    title: 'Parallel Market Spread Widened',          body: 'Official vs parallel rate gap for USD → NGN crossed 18% today.',                              time: 'Sep 21, 2026' },
+  { id: 6,  type: 'reliability', severity: 'medium',  title: 'New High-Reliability Merchant Detected',  body: 'A Bybit P2P merchant with 98% completion rate is now offering ₦1,720/$.',                     time: 'Sep 20, 2026' },
+  { id: 7,  type: 'fee-change',  severity: 'info',    title: 'Sendwave Fee Update',                     body: 'Sendwave reduced its flat fee from $2.50 to $1.99 for UK → NG transfers.',                    time: 'Sep 19, 2026' },
+  { id: 8,  type: 'reliability', severity: 'high',    title: 'Suspicious Merchant Activity',            body: 'A merchant on Bybit P2P with 12 trades and 41% completion rate is offering above-market rates.', time: 'Sep 19, 2026' },
+  { id: 9,  type: 'rate-spread', severity: 'success', title: 'Stable Week for GBP → NGN',               body: 'Rate has moved less than 1.2% over the last 7 days. Good time to send.',                      time: 'Sep 18, 2026' },
+  { id: 10, type: 'fee-change',  severity: 'medium',  title: 'Hidden FX Markup Detected',               body: 'Two providers are inflating rates by 0.8%–1.4% instead of showing fees upfront.',            time: 'Sep 17, 2026' },
 ]
 
 export const MOCK_TREND = [
@@ -112,7 +130,6 @@ export const MOCK_CORRIDORS = [
   { id: 4, fromCode: 'EUR', toCode: 'NGN', fromLabel: 'EU (EUR)', toLabel: 'Nigeria (NGN)', lastUsed: 'Aug 20, 2025' },
 ]
 
-// ---------- API CALLS ----------
 export const getComparison = async (corridor, amount) => {
   try {
     const res = await axios.get(`${API}/compare`, { params: { corridor, amount }, timeout: 4000 })
@@ -156,11 +173,9 @@ const SAVED_KEY = 'rateradar_saved_corridors'
 
 const defaultSaved = () => CORRIDORS.map((c, i) => ({
   id: c.value,
-  fromFlag: c.fromFlag,
-  toFlag: c.toFlag,
-  label: `${c.fromLabel.split(' (')[0]} → ${c.toLabel.split(' (')[0]}`,
   fromCode: c.fromCode,
   toCode: c.toCode,
+  label: `${c.fromLabel.split(' (')[0]} → ${c.toLabel.split(' (')[0]}`,
   lastUsed: '—',
   default: i === 0,
 }))
@@ -187,11 +202,9 @@ export const addSavedCorridor = (corridorValue) => {
     if (!c) return existing
     const updated = [...existing, {
       id: c.value,
-      fromFlag: c.fromFlag,
-      toFlag: c.toFlag,
-      label: `${c.fromLabel.split(' (')[0]} → ${c.toLabel.split(' (')[0]}`,
       fromCode: c.fromCode,
       toCode: c.toCode,
+      label: `${c.fromLabel.split(' (')[0]} → ${c.toLabel.split(' (')[0]}`,
       lastUsed: 'Just now',
       default: false,
     }]
